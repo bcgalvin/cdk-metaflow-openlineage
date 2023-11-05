@@ -110,8 +110,6 @@ exports[`snapshot Should match snapshot 1`] = `
         "DatabaseName": "metaflow",
         "EndpointType": "source",
         "EngineName": "postgres",
-        "Password": "{{resolve:secretsmanager:arn:aws:secretsmanager:us-east-1:123456789012:secret:test-secret:SecretString:password::}}",
-        "Port": 5432,
         "PostgreSqlSettings": {
           "SecretsManagerAccessRoleArn": {
             "Fn::GetAtt": [
@@ -121,13 +119,6 @@ exports[`snapshot Should match snapshot 1`] = `
           },
           "SecretsManagerSecretId": "test",
         },
-        "ServerName": {
-          "Fn::GetAtt": [
-            "metaflowopenlineagesnapshottestreadreplicareadreplicainstance721D98EE",
-            "Endpoint.Address",
-          ],
-        },
-        "Username": "{{resolve:secretsmanager:arn:aws:secretsmanager:us-east-1:123456789012:secret:test-secret:SecretString:username::}}",
       },
       "Type": "AWS::DMS::Endpoint",
     },
@@ -396,7 +387,102 @@ exports[`snapshot Should match snapshot 1`] = `
       },
       "Type": "AWS::IAM::Policy",
     },
+    "metaflowopenlineagesnapshottestkinesispipelineFirehoseReaderAE5504FD": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "firehose.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "Description": "Role for Firehose to read from Kinesis Stream  on storage layer",
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "kinesis:DescribeStream",
+                    "kinesis:DescribeStreamSummary",
+                    "kinesis:GetRecords",
+                    "kinesis:GetShardIterator",
+                    "kinesis:ListShards",
+                    "kinesis:SubscribeToShard",
+                  ],
+                  "Effect": "Allow",
+                  "Resource": {
+                    "Fn::GetAtt": [
+                      "metaflowopenlineagesnapshottestkinesispipelinetargetstream149689AD",
+                      "Arn",
+                    ],
+                  },
+                },
+              ],
+              "Version": "2012-10-17",
+            },
+            "PolicyName": "allow-s3-kinesis-logs",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "metaflowopenlineagesnapshottestkinesispipelineFirehoseReaderDefaultPolicy110C813B": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "kinesis:DescribeStreamSummary",
+                "kinesis:GetRecords",
+                "kinesis:GetShardIterator",
+                "kinesis:ListShards",
+                "kinesis:SubscribeToShard",
+                "kinesis:DescribeStream",
+                "kinesis:ListStreams",
+                "kinesis:DescribeStreamConsumer",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "metaflowopenlineagesnapshottestkinesispipelinetargetstream149689AD",
+                  "Arn",
+                ],
+              },
+            },
+            {
+              "Action": "kinesis:DescribeStream",
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "metaflowopenlineagesnapshottestkinesispipelinetargetstream149689AD",
+                  "Arn",
+                ],
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "metaflowopenlineagesnapshottestkinesispipelineFirehoseReaderDefaultPolicy110C813B",
+        "Roles": [
+          {
+            "Ref": "metaflowopenlineagesnapshottestkinesispipelineFirehoseReaderAE5504FD",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
     "metaflowopenlineagesnapshottestkinesispipelinedeliverystream673EDE51": {
+      "DependsOn": [
+        "metaflowopenlineagesnapshottestkinesispipelinefirehosewriter3DA679BE",
+        "metaflowopenlineagesnapshottestkinesispipelineFirehoseReaderDefaultPolicy110C813B",
+        "metaflowopenlineagesnapshottestkinesispipelineFirehoseReaderAE5504FD",
+      ],
       "Metadata": {
         "cdk_nag": {
           "rules_to_suppress": [
@@ -448,7 +534,7 @@ exports[`snapshot Should match snapshot 1`] = `
           },
           "RoleARN": {
             "Fn::GetAtt": [
-              "metaflowopenlineagesnapshottestkinesispipelinefirehosereader15CC90A5",
+              "metaflowopenlineagesnapshottestkinesispipelineFirehoseReaderAE5504FD",
               "Arn",
             ],
           },
@@ -473,58 +559,6 @@ exports[`snapshot Should match snapshot 1`] = `
       },
       "Type": "AWS::Logs::LogStream",
       "UpdateReplacePolicy": "Delete",
-    },
-    "metaflowopenlineagesnapshottestkinesispipelinefirehosereader15CC90A5": {
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Statement": [
-            {
-              "Action": "sts:AssumeRole",
-              "Effect": "Allow",
-              "Principal": {
-                "Service": "firehose.amazonaws.com",
-              },
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-      },
-      "Type": "AWS::IAM::Role",
-    },
-    "metaflowopenlineagesnapshottestkinesispipelinefirehosereaderDefaultPolicy72626C76": {
-      "Properties": {
-        "PolicyDocument": {
-          "Statement": [
-            {
-              "Action": [
-                "kinesis:DescribeStreamSummary",
-                "kinesis:GetRecords",
-                "kinesis:GetShardIterator",
-                "kinesis:ListShards",
-                "kinesis:SubscribeToShard",
-                "kinesis:DescribeStream",
-                "kinesis:ListStreams",
-                "kinesis:DescribeStreamConsumer",
-              ],
-              "Effect": "Allow",
-              "Resource": {
-                "Fn::GetAtt": [
-                  "metaflowopenlineagesnapshottestkinesispipelinetargetstream149689AD",
-                  "Arn",
-                ],
-              },
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-        "PolicyName": "metaflowopenlineagesnapshottestkinesispipelinefirehosereaderDefaultPolicy72626C76",
-        "Roles": [
-          {
-            "Ref": "metaflowopenlineagesnapshottestkinesispipelinefirehosereader15CC90A5",
-          },
-        ],
-      },
-      "Type": "AWS::IAM::Policy",
     },
     "metaflowopenlineagesnapshottestkinesispipelinefirehosewriter3DA679BE": {
       "Metadata": {
@@ -600,6 +634,19 @@ exports[`snapshot Should match snapshot 1`] = `
                   ],
                 },
               ],
+            },
+            {
+              "Action": [
+                "logs:CreateLogStream",
+                "logs:PutLogEvents",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "metaflowopenlineagesnapshottestkinesispipelinefirehoselgE0C4F371",
+                  "Arn",
+                ],
+              },
             },
           ],
           "Version": "2012-10-17",

@@ -1,5 +1,5 @@
-import { Duration, RemovalPolicy } from 'aws-cdk-lib';
-import { IRole, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
+import { CfnResource, Duration, RemovalPolicy } from 'aws-cdk-lib';
+import { Effect, IRole, PolicyDocument, PolicyStatement, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 import { IStream, Stream, StreamEncryption, StreamMode } from 'aws-cdk-lib/aws-kinesis';
 import { CfnDeliveryStream } from 'aws-cdk-lib/aws-kinesisfirehose';
 import { ILogGroup, LogGroup, LogStream, RetentionDays } from 'aws-cdk-lib/aws-logs';
@@ -31,12 +31,28 @@ export class KinesisPipeline extends Construct {
       assumedBy: new ServicePrincipal('firehose.amazonaws.com'),
     });
 
-    this.readerRole = new Role(this, `firehose-reader`, {
+    this.readerRole = new Role(this, 'FirehoseReader', {
       assumedBy: new ServicePrincipal('firehose.amazonaws.com'),
+      description: 'Role for Firehose to read from Kinesis Stream  on storage layer',
+      inlinePolicies: {
+        'allow-s3-kinesis-logs': new PolicyDocument({
+          statements: [
+            new PolicyStatement({
+              effect: Effect.ALLOW,
+              actions: [
+                'kinesis:DescribeStream',
+                'kinesis:DescribeStreamSummary',
+                'kinesis:GetRecords',
+                'kinesis:GetShardIterator',
+                'kinesis:ListShards',
+                'kinesis:SubscribeToShard',
+              ],
+              resources: [this.stream.streamArn],
+            }),
+          ],
+        }),
+      },
     });
-
-    this.bucket.grantWrite(this.writerRole);
-    this.stream.grantRead(this.readerRole);
 
     this.firehoseLogGroup = new LogGroup(this, `firehose-lg`, {
       retention: RetentionDays.ONE_WEEK,
@@ -71,6 +87,14 @@ export class KinesisPipeline extends Construct {
         errorOutputPrefix: 'error/',
       },
     });
+
+    this.deliveryStream.node.addDependency(this.readerRole.node.defaultChild as CfnResource);
+    this.deliveryStream.node.addDependency(this.writerRole.node.defaultChild as CfnResource);
+    this.stream.grantRead(this.readerRole);
+    this.bucket.grantWrite(this.writerRole);
+    const grant = this.stream.grant(this.readerRole, 'kinesis:DescribeStream');
+    grant.applyBefore(this.deliveryStream);
+    this.firehoseLogGroup.grantWrite(this.writerRole);
 
     NagSuppressions.addResourceSuppressions(
       this.writerRole,

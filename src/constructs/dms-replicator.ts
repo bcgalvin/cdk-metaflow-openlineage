@@ -7,7 +7,6 @@ import {
 import { IVpc, SecurityGroup, SubnetType } from 'aws-cdk-lib/aws-ec2';
 import { ManagedPolicy, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 import { IStream } from 'aws-cdk-lib/aws-kinesis';
-import { Credentials } from 'aws-cdk-lib/aws-rds';
 import { IBucket } from 'aws-cdk-lib/aws-s3';
 import { NagSuppressions } from 'cdk-nag';
 import { Construct } from 'constructs';
@@ -89,10 +88,6 @@ export class DMSReplicator extends Construct {
         secretsManagerSecretId: dbSecret.secretName,
       },
       databaseName: 'metaflow',
-      username: Credentials.fromSecret(dbSecret).username,
-      password: Credentials.fromSecret(dbSecret).password?.toString(),
-      port: 5432,
-      serverName: readReplica.instanceEndpoint.hostname,
     });
 
     const target = new CfnEndpoint(this, 'dms-target', {
@@ -135,7 +130,7 @@ export class DMSReplicator extends Construct {
       ],
       true,
     );
-
+    // kinesis: DescribeStream;
     NagSuppressions.addResourceSuppressions(
       targetRole,
       [
