@@ -1,7 +1,8 @@
 import { Stack } from 'aws-cdk-lib';
 import { SubnetType, Vpc } from 'aws-cdk-lib/aws-ec2';
+import { IBucket } from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
-import { RDSReadReplica, ReplicaConfig } from './constructs';
+import { DmsReplicationBucket, RDSReadReplica, ReplicaConfig } from './constructs';
 
 export interface MetaflowOpenlineageProps {
   readonly vpcId: string;
@@ -9,8 +10,12 @@ export interface MetaflowOpenlineageProps {
 }
 
 export class MetaflowOpenlineage extends Construct {
+  public readonly dmsReplicationBucket: IBucket;
+
   constructor(scope: Construct, id: string, props: MetaflowOpenlineageProps) {
     super(scope, id);
+
+    this.dmsReplicationBucket = new DmsReplicationBucket(this, 'dms-replication-bucket');
 
     const vpc = Vpc.fromLookup(this, 'vpc-lookup', {
       vpcId: props.vpcId,

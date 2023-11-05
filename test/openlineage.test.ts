@@ -24,6 +24,7 @@ describe('snapshot', () => {
         securityGroupIds: ['sg-0abc12c3de4fgh567'],
         postgresVersion: PostgresEngineVersion.VER_14_7,
         instanceType: InstanceType.of(InstanceClass.BURSTABLE3, InstanceSize.SMALL),
+        dbSecretArn: 'arn:aws:secretsmanager:us-east-1:123456789012:secret:test-secret',
       },
     });
 

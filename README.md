@@ -40,9 +40,10 @@ new MetaflowOpenlineage(stack, 'metaflow-openlineage-snapshot-test', {
         instanceEndpointAddress: 'test.pg.us-east-1.rds.amazonaws.com',
         port: 5432,
         instanceIdentifier: 'test-mf',
-        securityGroupIds: ['sg-0efd56e2aa8edc334'],
+        securityGroupIds: ['sg-0abc12c3de4fgh567'],
         postgresVersion: PostgresEngineVersion.VER_14_7,
         instanceType: InstanceType.of(InstanceClass.BURSTABLE3, InstanceSize.SMALL),
+        dbSecretArn: 'arn:aws:secretsmanager:us-east-1:123456789012:secret:test-secret',
     },
 });
 
