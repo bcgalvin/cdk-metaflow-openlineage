@@ -52,12 +52,12 @@ export class RDSReadReplica extends Construct {
 
     // Allow all traffic within the security group on port 443
     readReplicaSecurityGroup.connections.allowInternally(Port.tcp(443), 'Traffic within this SecurityGroup');
-
+    // Allow all traffic within cidr for private subnets
     props.vpc.privateSubnets.forEach((subnet: ISubnet) => {
       readReplicaSecurityGroup.addIngressRule(
         Peer.ipv4(subnet.ipv4CidrBlock),
         Port.tcp(5432),
-        'Allow TCP port for PostgreSQL from private subnets',
+        'Traffic from private subnets',
       );
     });
 
