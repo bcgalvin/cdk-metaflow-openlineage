@@ -161,7 +161,18 @@ exports[`snapshot Should match snapshot 1`] = `
               "Action": "sts:AssumeRole",
               "Effect": "Allow",
               "Principal": {
-                "Service": "dms.amazonaws.com",
+                "Service": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "dms.",
+                      {
+                        "Ref": "AWS::Region",
+                      },
+                      ".amazonaws.com",
+                    ],
+                  ],
+                },
               },
             },
           ],

@@ -1,3 +1,4 @@
+import { Aws } from 'aws-cdk-lib';
 import {
   CfnEndpoint,
   CfnReplicationInstance,
@@ -45,7 +46,7 @@ export class DMSReplicator extends Construct {
     });
 
     const dmsSecretRole = new Role(this, `dms-secret-role`, {
-      assumedBy: new ServicePrincipal('dms.amazonaws.com'),
+      assumedBy: new ServicePrincipal(`dms.${Aws.REGION}.amazonaws.com`),
     });
 
     const dmsRole = new Role(this, `dms-role`, {
