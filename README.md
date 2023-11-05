@@ -34,7 +34,21 @@ pip install cdk-metaflow-openlineage
 const app = new App();
 const stack = new Stack(app, 'Stack');
 
-new MetaflowOpenlineage(stack, 'metaflow-openlineage-snapshot-test');
+new MetaflowOpenlineage(stack, 'metaflow-openlineage-snapshot-test', {
+    vpcId: 'vpc-12ab3c4d',
+    replicaConfig: {
+        instanceEndpointAddress: 'test.pg.us-east-1.rds.amazonaws.com',
+        port: 5432,
+        instanceIdentifier: 'test-mf',
+        securityGroupIds: ['sg-0efd56e2aa8edc334'],
+        postgresVersion: PostgresEngineVersion.VER_14_7,
+        instanceType: InstanceType.of(InstanceClass.BURSTABLE3, InstanceSize.SMALL),
+        subnetSelection: {
+            onePerAz: false,
+            subnetType: SubnetType.PRIVATE_ISOLATED
+        },
+    },
+});
 
 app.synth();
 ```

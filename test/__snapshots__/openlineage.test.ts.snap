@@ -9,6 +9,84 @@ exports[`snapshot Should match snapshot 1`] = `
       "Type": "AWS::SSM::Parameter::Value<String>",
     },
   },
+  "Resources": {
+    "metaflowopenlineagesnapshottestolreadreplicaParameterGroup4B379A74": {
+      "Properties": {
+        "Description": "Parameter group for postgres14",
+        "Family": "postgres14",
+        "Parameters": {
+          "rds.logical_replication": "1",
+          "wal_sender_timeout": "0",
+        },
+      },
+      "Type": "AWS::RDS::DBParameterGroup",
+    },
+    "metaflowopenlineagesnapshottestolreadreplicaolreadreplicareadreplicainstanceB62C1055": {
+      "DeletionPolicy": "Snapshot",
+      "Metadata": {
+        "cdk_nag": {
+          "rules_to_suppress": [
+            {
+              "id": "AwsSolutions-RDS11",
+              "reason": "Replica uses default port",
+            },
+            {
+              "id": "AwsSolutions-RDS10",
+              "reason": "Replica doesn't have deletion protection turned on",
+            },
+            {
+              "id": "AwsSolutions-RDS3",
+              "reason": "Replica is single AZ",
+            },
+            {
+              "id": "AwsSolutions-RDS2",
+              "reason": "Replica not encrypted",
+            },
+          ],
+        },
+      },
+      "Properties": {
+        "CopyTagsToSnapshot": true,
+        "DBInstanceClass": "db.t3.small",
+        "DBParameterGroupName": {
+          "Ref": "metaflowopenlineagesnapshottestolreadreplicaParameterGroup4B379A74",
+        },
+        "DBSubnetGroupName": {
+          "Ref": "metaflowopenlineagesnapshottestolreadreplicaolreadreplicareadreplicainstanceSubnetGroup914CCFBD",
+        },
+        "MultiAZ": false,
+        "PubliclyAccessible": false,
+        "SourceDBInstanceIdentifier": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition",
+              },
+              ":rds:us-east-1:123456789012:db:test-mf",
+            ],
+          ],
+        },
+        "StorageType": "gp2",
+        "VPCSecurityGroups": [
+          "sg-0efd56e2aa8edc334",
+        ],
+      },
+      "Type": "AWS::RDS::DBInstance",
+      "UpdateReplacePolicy": "Snapshot",
+    },
+    "metaflowopenlineagesnapshottestolreadreplicaolreadreplicareadreplicainstanceSubnetGroup914CCFBD": {
+      "Properties": {
+        "DBSubnetGroupDescription": "Subnet group for ol-read-replica-read-replica-instance database",
+        "SubnetIds": [
+          "p-12345",
+          "p-67890",
+        ],
+      },
+      "Type": "AWS::RDS::DBSubnetGroup",
+    },
+  },
   "Rules": {
     "CheckBootstrapVersion": {
       "Assertions": [
