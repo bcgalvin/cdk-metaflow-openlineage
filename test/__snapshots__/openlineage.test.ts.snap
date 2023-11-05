@@ -66,60 +66,6 @@ exports[`snapshot Should match snapshot 1`] = `
       },
       "Type": "AWS::IAM::Role",
     },
-    "metaflowopenlineagesnapshottestdmsreplicatorDMSStreamRole765A56CB": {
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Statement": [
-            {
-              "Action": "sts:AssumeRole",
-              "Effect": "Allow",
-              "Principal": {
-                "Service": "dms.amazonaws.com",
-              },
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-      },
-      "Type": "AWS::IAM::Role",
-    },
-    "metaflowopenlineagesnapshottestdmsreplicatorDMSStreamRoleDefaultPolicyDF7AA5FD": {
-      "Properties": {
-        "PolicyDocument": {
-          "Statement": [
-            {
-              "Action": [
-                "kinesis:DescribeStreamSummary",
-                "kinesis:GetRecords",
-                "kinesis:GetShardIterator",
-                "kinesis:ListShards",
-                "kinesis:SubscribeToShard",
-                "kinesis:DescribeStream",
-                "kinesis:ListStreams",
-                "kinesis:DescribeStreamConsumer",
-                "kinesis:PutRecord",
-                "kinesis:PutRecords",
-              ],
-              "Effect": "Allow",
-              "Resource": {
-                "Fn::GetAtt": [
-                  "metaflowopenlineagesnapshottestkinesispipelinetargetstream149689AD",
-                  "Arn",
-                ],
-              },
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-        "PolicyName": "metaflowopenlineagesnapshottestdmsreplicatorDMSStreamRoleDefaultPolicyDF7AA5FD",
-        "Roles": [
-          {
-            "Ref": "metaflowopenlineagesnapshottestdmsreplicatorDMSStreamRole765A56CB",
-          },
-        ],
-      },
-      "Type": "AWS::IAM::Policy",
-    },
     "metaflowopenlineagesnapshottestdmsreplicatorDmsInstance8614E0D6": {
       "Properties": {
         "AllocatedStorage": 10,
@@ -166,17 +112,147 @@ exports[`snapshot Should match snapshot 1`] = `
         "EngineName": "postgres",
         "Password": "{{resolve:secretsmanager:arn:aws:secretsmanager:us-east-1:123456789012:secret:test-secret:SecretString:password::}}",
         "Port": 5432,
+        "PostgreSqlSettings": {
+          "SecretsManagerAccessRoleArn": {
+            "Fn::GetAtt": [
+              "metaflowopenlineagesnapshottestdmsreplicatordmssecretrole699408F4",
+              "Arn",
+            ],
+          },
+          "SecretsManagerSecretId": "test",
+        },
         "ServerName": {
           "Fn::GetAtt": [
             "metaflowopenlineagesnapshottestreadreplicareadreplicainstance721D98EE",
             "Endpoint.Address",
           ],
         },
-        "Username": "metaflow",
+        "Username": "{{resolve:secretsmanager:arn:aws:secretsmanager:us-east-1:123456789012:secret:test-secret:SecretString:username::}}",
       },
       "Type": "AWS::DMS::Endpoint",
     },
-    "metaflowopenlineagesnapshottestdmsreplicatordmsTargetRoleB925A950": {
+    "metaflowopenlineagesnapshottestdmsreplicatordmsrole96DDFCD4": {
+      "Metadata": {
+        "cdk_nag": {
+          "rules_to_suppress": [
+            {
+              "id": "AwsSolutions-IAM4",
+              "reason": "It's ok for us to use managed policies",
+            },
+          ],
+        },
+      },
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "dms.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          "arn:aws:iam::aws:policy/service-role/AmazonDMSVPCManagementRole",
+        ],
+        "RoleName": "dms-vpc-role",
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "metaflowopenlineagesnapshottestdmsreplicatordmssecretrole699408F4": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "dms.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "metaflowopenlineagesnapshottestdmsreplicatordmssecretroleDefaultPolicyA60A4050": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "secretsmanager:GetSecretValue",
+                "secretsmanager:DescribeSecret",
+              ],
+              "Effect": "Allow",
+              "Resource": "arn:aws:secretsmanager:us-east-1:123456789012:secret:test-secret",
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "metaflowopenlineagesnapshottestdmsreplicatordmssecretroleDefaultPolicyA60A4050",
+        "Roles": [
+          {
+            "Ref": "metaflowopenlineagesnapshottestdmsreplicatordmssecretrole699408F4",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "metaflowopenlineagesnapshottestdmsreplicatordmssg2B8FBD94": {
+      "Properties": {
+        "GroupDescription": "Default/metaflow-openlineage-snapshot-test/dms-replicator/dms-sg",
+        "SecurityGroupEgress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow all outbound traffic by default",
+            "IpProtocol": "-1",
+          },
+        ],
+        "VpcId": "vpc-12345",
+      },
+      "Type": "AWS::EC2::SecurityGroup",
+    },
+    "metaflowopenlineagesnapshottestdmsreplicatordmssubnetgroup2040688D": {
+      "DependsOn": [
+        "metaflowopenlineagesnapshottestdmsreplicatordmsrole96DDFCD4",
+      ],
+      "Properties": {
+        "ReplicationSubnetGroupDescription": "Replication Subnet group",
+        "SubnetIds": [
+          "p-12345",
+          "p-67890",
+        ],
+      },
+      "Type": "AWS::DMS::ReplicationSubnetGroup",
+    },
+    "metaflowopenlineagesnapshottestdmsreplicatordmstarget6074BCFE": {
+      "Properties": {
+        "EndpointType": "target",
+        "EngineName": "kinesis",
+        "KinesisSettings": {
+          "MessageFormat": "JSON",
+          "ServiceAccessRoleArn": {
+            "Fn::GetAtt": [
+              "metaflowopenlineagesnapshottestdmsreplicatorwriterRoleA5DCEF70",
+              "Arn",
+            ],
+          },
+          "StreamArn": {
+            "Fn::GetAtt": [
+              "metaflowopenlineagesnapshottestkinesispipelinetargetstream149689AD",
+              "Arn",
+            ],
+          },
+        },
+      },
+      "Type": "AWS::DMS::Endpoint",
+    },
+    "metaflowopenlineagesnapshottestdmsreplicatortargetRole4E06D241": {
       "Metadata": {
         "cdk_nag": {
           "rules_to_suppress": [
@@ -203,7 +279,7 @@ exports[`snapshot Should match snapshot 1`] = `
       },
       "Type": "AWS::IAM::Role",
     },
-    "metaflowopenlineagesnapshottestdmsreplicatordmsTargetRoleDefaultPolicy14AA9401": {
+    "metaflowopenlineagesnapshottestdmsreplicatortargetRoleDefaultPolicyE48668C6": {
       "Metadata": {
         "cdk_nag": {
           "rules_to_suppress": [
@@ -257,60 +333,68 @@ exports[`snapshot Should match snapshot 1`] = `
           ],
           "Version": "2012-10-17",
         },
-        "PolicyName": "metaflowopenlineagesnapshottestdmsreplicatordmsTargetRoleDefaultPolicy14AA9401",
+        "PolicyName": "metaflowopenlineagesnapshottestdmsreplicatortargetRoleDefaultPolicyE48668C6",
         "Roles": [
           {
-            "Ref": "metaflowopenlineagesnapshottestdmsreplicatordmsTargetRoleB925A950",
+            "Ref": "metaflowopenlineagesnapshottestdmsreplicatortargetRole4E06D241",
           },
         ],
       },
       "Type": "AWS::IAM::Policy",
     },
-    "metaflowopenlineagesnapshottestdmsreplicatordmssg2B8FBD94": {
+    "metaflowopenlineagesnapshottestdmsreplicatorwriterRoleA5DCEF70": {
       "Properties": {
-        "GroupDescription": "Default/metaflow-openlineage-snapshot-test/dms-replicator/dms-sg",
-        "SecurityGroupEgress": [
-          {
-            "CidrIp": "0.0.0.0/0",
-            "Description": "Allow all outbound traffic by default",
-            "IpProtocol": "-1",
-          },
-        ],
-        "VpcId": "vpc-12345",
-      },
-      "Type": "AWS::EC2::SecurityGroup",
-    },
-    "metaflowopenlineagesnapshottestdmsreplicatordmssubnetgroup2040688D": {
-      "Properties": {
-        "ReplicationSubnetGroupDescription": "Replication Subnet group",
-        "SubnetIds": [
-          "p-12345",
-          "p-67890",
-        ],
-      },
-      "Type": "AWS::DMS::ReplicationSubnetGroup",
-    },
-    "metaflowopenlineagesnapshottestdmsreplicatordmstarget6074BCFE": {
-      "Properties": {
-        "EndpointType": "target",
-        "EngineName": "kinesis",
-        "KinesisSettings": {
-          "MessageFormat": "JSON",
-          "ServiceAccessRoleArn": {
-            "Fn::GetAtt": [
-              "metaflowopenlineagesnapshottestdmsreplicatorDMSStreamRole765A56CB",
-              "Arn",
-            ],
-          },
-          "StreamArn": {
-            "Fn::GetAtt": [
-              "metaflowopenlineagesnapshottestkinesispipelinetargetstream149689AD",
-              "Arn",
-            ],
-          },
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "dms.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
         },
       },
-      "Type": "AWS::DMS::Endpoint",
+      "Type": "AWS::IAM::Role",
+    },
+    "metaflowopenlineagesnapshottestdmsreplicatorwriterRoleDefaultPolicy7582E3EB": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "kinesis:DescribeStreamSummary",
+                "kinesis:GetRecords",
+                "kinesis:GetShardIterator",
+                "kinesis:ListShards",
+                "kinesis:SubscribeToShard",
+                "kinesis:DescribeStream",
+                "kinesis:ListStreams",
+                "kinesis:DescribeStreamConsumer",
+                "kinesis:PutRecord",
+                "kinesis:PutRecords",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "metaflowopenlineagesnapshottestkinesispipelinetargetstream149689AD",
+                  "Arn",
+                ],
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "metaflowopenlineagesnapshottestdmsreplicatorwriterRoleDefaultPolicy7582E3EB",
+        "Roles": [
+          {
+            "Ref": "metaflowopenlineagesnapshottestdmsreplicatorwriterRoleA5DCEF70",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
     },
     "metaflowopenlineagesnapshottestkinesispipelinedeliverystream673EDE51": {
       "Metadata": {

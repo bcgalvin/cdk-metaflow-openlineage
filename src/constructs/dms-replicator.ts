@@ -1,4 +1,3 @@
-import { SecretValue } from 'aws-cdk-lib';
 import {
   CfnEndpoint,
   CfnReplicationInstance,
@@ -6,7 +5,7 @@ import {
   CfnReplicationTask,
 } from 'aws-cdk-lib/aws-dms';
 import { IVpc, SecurityGroup, SubnetType } from 'aws-cdk-lib/aws-ec2';
-import { Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
+import { ManagedPolicy, Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 import { IStream } from 'aws-cdk-lib/aws-kinesis';
 import { Credentials } from 'aws-cdk-lib/aws-rds';
 import { IBucket } from 'aws-cdk-lib/aws-s3';
@@ -39,12 +38,30 @@ export class DMSReplicator extends Construct {
     const { readReplica, dbSecret } = { ...props.source.sourceDB };
     const { stream, bucket } = { ...props.target };
 
-    const writerRole = new Role(this, 'DMSStreamRole', {
+    const writerRole = new Role(this, 'writerRole', {
       assumedBy: new ServicePrincipal('dms.amazonaws.com'),
     });
-    const targetRole = new Role(this, 'dmsTargetRole', {
+    const targetRole = new Role(this, 'targetRole', {
       assumedBy: new ServicePrincipal('dms.amazonaws.com'),
     });
+
+    const dmsSecretRole = new Role(this, `dms-secret-role`, {
+      assumedBy: new ServicePrincipal('dms.amazonaws.com'),
+    });
+
+    const dmsRole = new Role(this, `dms-role`, {
+      roleName: `dms-vpc-role`, // need the name for this one
+      assumedBy: new ServicePrincipal('dms.amazonaws.com'),
+    });
+
+    dmsRole.addManagedPolicy(
+      ManagedPolicy.fromManagedPolicyArn(
+        this,
+        `AmazonDMSVPCManagementRole`,
+        `arn:aws:iam::aws:policy/service-role/AmazonDMSVPCManagementRole`,
+      ),
+    );
+
     bucket.grantReadWrite(targetRole);
 
     const dmsSecurityGroup = new SecurityGroup(this, 'dms-sg', {
@@ -54,24 +71,28 @@ export class DMSReplicator extends Construct {
     const subnetGroup = new CfnReplicationSubnetGroup(this, 'dms-subnet-group', {
       subnetIds: props.vpc.selectSubnets({
         subnetType: SubnetType.PRIVATE_WITH_EGRESS,
+        onePerAz: true,
       }).subnetIds,
       replicationSubnetGroupDescription: 'Replication Subnet group',
     });
 
+    subnetGroup.node.addDependency(dmsRole);
     stream.grantReadWrite(writerRole);
     readReplica.connections.allowDefaultPortFrom(dmsSecurityGroup);
-
-    const credentials = Credentials.fromSecret(dbSecret);
-    const passwordSecretValue = new SecretValue(credentials.password);
+    dbSecret.grantRead(dmsSecretRole);
 
     const source = new CfnEndpoint(this, 'Source', {
       endpointType: 'source',
       engineName: 'postgres',
+      postgreSqlSettings: {
+        secretsManagerAccessRoleArn: dmsSecretRole.roleArn,
+        secretsManagerSecretId: dbSecret.secretName,
+      },
       databaseName: 'metaflow',
-      username: 'metaflow',
-      password: passwordSecretValue.toString(),
+      username: Credentials.fromSecret(dbSecret).username,
+      password: Credentials.fromSecret(dbSecret).password?.toString(),
       port: 5432,
-      serverName: readReplica.dbInstanceEndpointAddress,
+      serverName: readReplica.instanceEndpoint.hostname,
     });
 
     const target = new CfnEndpoint(this, 'dms-target', {
@@ -103,6 +124,17 @@ export class DMSReplicator extends Construct {
       tableMappings: JSON.stringify(this.getMappingRule()),
       replicationTaskSettings: JSON.stringify(this.getTaskSettings()),
     });
+
+    NagSuppressions.addResourceSuppressions(
+      dmsRole,
+      [
+        {
+          id: 'AwsSolutions-IAM4',
+          reason: "It's ok for us to use managed policies",
+        },
+      ],
+      true,
+    );
 
     NagSuppressions.addResourceSuppressions(
       targetRole,
