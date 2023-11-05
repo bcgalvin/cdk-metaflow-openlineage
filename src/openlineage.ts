@@ -17,8 +17,6 @@ export class MetaflowOpenlineage extends Construct {
       region: Stack.of(this).region,
     });
 
-    vpc.addGatewayEndpoint();
-
     new RDSReadReplica(this, 'ol-read-replica', {
       vpc: vpc,
       replicaConfig: props.replicaConfig,
