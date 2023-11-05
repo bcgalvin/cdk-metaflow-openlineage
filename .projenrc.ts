@@ -1,8 +1,10 @@
+import * as path from 'path';
 import { TextFile } from 'projen';
 import { AwsCdkConstructLibrary } from 'projen/lib/awscdk';
 import { ArrowParens, NodePackageManager, TrailingComma } from 'projen/lib/javascript';
 
 const cdkVersion = '2.104.0';
+const minNodeVersion = '18.12.0';
 const commonIgnore = ['.idea', '.vscode', 'cdk.context.json', 'index.scip'];
 
 const project = new AwsCdkConstructLibrary({
@@ -15,7 +17,9 @@ const project = new AwsCdkConstructLibrary({
   description: 'AWS CDK construct library to forward metadata database cdc events to dynamodb',
   packageManager: NodePackageManager.YARN_CLASSIC,
   license: 'MIT',
+  docgenFilePath: path.join(__dirname, 'docs', 'cdk-metaflow-openlineage-api.md'),
   // Dependencies
+  minNodeVersion: minNodeVersion,
   jsiiVersion: '~5.0.0',
   deps: ['cdk-nag'],
   devDeps: [
@@ -80,6 +84,7 @@ project.postCompileTask.spawn(rosettaTask);
 project.addGitIgnore('.jsii.tabl.json');
 project.addPackageIgnore('.jsii.tabl.json');
 project.addPackageIgnore('/rosetta/');
+project.addPackageIgnore('/docs/');
 
 new TextFile(project, 'rosetta/default.ts-fixture', {
   lines: [
@@ -101,6 +106,16 @@ new TextFile(project, 'rosetta/default.ts-fixture', {
     '  }',
     '}',
   ],
+  marker: false,
+});
+
+new TextFile(project, '.adr-dir', {
+  lines: ['docs/adr'],
+  marker: false,
+});
+
+new TextFile(project, '.nvmrc', {
+  lines: [minNodeVersion],
   marker: false,
 });
 

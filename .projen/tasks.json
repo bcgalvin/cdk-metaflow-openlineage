@@ -88,7 +88,7 @@
       "description": "Generate API.md from .jsii manifest",
       "steps": [
         {
-          "exec": "jsii-docgen -o API.md"
+          "exec": "jsii-docgen -o /Users/bryan.galvin/Desktop/cdk-metaflow-openlineage/docs/cdk-metaflow-openlineage-api.md"
         }
       ]
     },
@@ -296,7 +296,7 @@
       "description": "Run tests",
       "steps": [
         {
-          "exec": "jest --passWithNoTests --updateSnapshot",
+          "exec": "jest --passWithNoTests --coverageProvider=v8 --updateSnapshot",
           "receiveArgs": true
         },
         {
