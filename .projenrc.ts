@@ -24,6 +24,7 @@ const project = new AwsCdkConstructLibrary({
   deps: ['cdk-nag'],
   devDeps: [
     '@types/aws-lambda',
+    `@aws-cdk/aws-lambda-python-alpha@^${cdkVersion}-alpha.0`,
     `@aws-cdk/integ-runner@^${cdkVersion}-alpha.0`,
     `@aws-cdk/integ-tests-alpha@^${cdkVersion}-alpha.0`,
   ],

@@ -15,7 +15,7 @@ import {
   ParameterGroup,
   PostgresEngineVersion,
 } from 'aws-cdk-lib/aws-rds';
-import { Secret } from 'aws-cdk-lib/aws-secretsmanager';
+import { ISecret, Secret } from 'aws-cdk-lib/aws-secretsmanager';
 import { NagSuppressions } from 'cdk-nag';
 import { Construct } from 'constructs';
 
@@ -38,6 +38,7 @@ export interface RDSReadReplicaProps {
 export class RDSReadReplica extends Construct {
   public readonly readReplica: DatabaseInstanceReadReplica;
   public readonly readReplicaSecurityGroups: ISecurityGroup[];
+  public readonly dbSecret: ISecret;
 
   constructor(scope: Construct, id: string, props: RDSReadReplicaProps) {
     super(scope, id);
@@ -46,7 +47,7 @@ export class RDSReadReplica extends Construct {
       SecurityGroup.fromSecurityGroupId(this, `${id}-${secgroupId}-sg`, secgroupId),
     );
 
-    const dbSecret = Secret.fromSecretCompleteArn(this, `${id}-database-secret`, props.replicaConfig.dbSecretArn);
+    this.dbSecret = Secret.fromSecretCompleteArn(this, `${id}-database-secret`, props.replicaConfig.dbSecretArn);
 
     const readReplicaSecurityGroup = new SecurityGroup(this, `${id}-read-replica-sg`, {
       allowAllOutbound: false,
@@ -76,7 +77,7 @@ export class RDSReadReplica extends Construct {
       },
     );
 
-    const replicationParameterGroup = new ParameterGroup(this, 'ParameterGroup', {
+    const replicationParameterGroup = new ParameterGroup(this, `${id}-read-replica-param-group`, {
       engine: DatabaseInstanceEngine.postgres({ version: props.replicaConfig.postgresVersion }),
       parameters: {
         'rds.logical_replication': '1',
@@ -94,7 +95,7 @@ export class RDSReadReplica extends Construct {
       multiAz: false,
       publiclyAccessible: false,
     });
-    dbSecret.attach(this.readReplica);
+    this.dbSecret.attach(this.readReplica);
 
     this.readReplica.connections.allowDefaultPortInternally();
     this.readReplicaSecurityGroups = this.readReplica.connections.securityGroups;
