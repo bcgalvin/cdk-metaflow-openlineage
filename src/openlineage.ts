@@ -1,7 +1,7 @@
 import { Stack } from 'aws-cdk-lib';
 import { SubnetType, Vpc } from 'aws-cdk-lib/aws-ec2';
 import { Construct } from 'constructs';
-import { KinesisPipeline, RDSReadReplica, ReplicaConfig } from './constructs';
+import { DMSReplicator, KinesisPipeline, RDSReadReplica, ReplicaConfig } from './constructs';
 
 export interface MetaflowOpenlineageProps {
   readonly vpcId: string;
@@ -22,12 +22,23 @@ export class MetaflowOpenlineage extends Construct {
       onePerAz: true,
     });
 
-    new RDSReadReplica(this, `read-replica`, {
+    const readReplica = new RDSReadReplica(this, `read-replica`, {
       vpc: vpc,
       vpcSubnets: vpcSubnets,
       replicaConfig: props.replicaConfig,
     });
 
-    new KinesisPipeline(this, `kinesis-pipeline`);
+    const kinesisPipeline = new KinesisPipeline(this, `kinesis-pipeline`);
+
+    new DMSReplicator(this, 'dms-replicator', {
+      vpc: vpc,
+      source: {
+        sourceDB: readReplica,
+      },
+      target: {
+        bucket: kinesisPipeline.bucket,
+        stream: kinesisPipeline.stream,
+      },
+    });
   }
 }

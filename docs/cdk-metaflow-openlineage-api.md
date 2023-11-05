@@ -2,6 +2,127 @@
 
 ## Constructs <a name="Constructs" id="Constructs"></a>
 
+### DMSReplicator <a name="DMSReplicator" id="cdk-metaflow-openlineage.DMSReplicator"></a>
+
+#### Initializers <a name="Initializers" id="cdk-metaflow-openlineage.DMSReplicator.Initializer"></a>
+
+```typescript
+import { DMSReplicator } from 'cdk-metaflow-openlineage'
+
+new DMSReplicator(scope: Construct, id: string, props: DMSReplicatorProps)
+```
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#cdk-metaflow-openlineage.DMSReplicator.Initializer.parameter.scope">scope</a></code> | <code>constructs.Construct</code> | *No description.* |
+| <code><a href="#cdk-metaflow-openlineage.DMSReplicator.Initializer.parameter.id">id</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#cdk-metaflow-openlineage.DMSReplicator.Initializer.parameter.props">props</a></code> | <code><a href="#cdk-metaflow-openlineage.DMSReplicatorProps">DMSReplicatorProps</a></code> | *No description.* |
+
+---
+
+##### `scope`<sup>Required</sup> <a name="scope" id="cdk-metaflow-openlineage.DMSReplicator.Initializer.parameter.scope"></a>
+
+- *Type:* constructs.Construct
+
+---
+
+##### `id`<sup>Required</sup> <a name="id" id="cdk-metaflow-openlineage.DMSReplicator.Initializer.parameter.id"></a>
+
+- *Type:* string
+
+---
+
+##### `props`<sup>Required</sup> <a name="props" id="cdk-metaflow-openlineage.DMSReplicator.Initializer.parameter.props"></a>
+
+- *Type:* <a href="#cdk-metaflow-openlineage.DMSReplicatorProps">DMSReplicatorProps</a>
+
+---
+
+#### Methods <a name="Methods" id="Methods"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#cdk-metaflow-openlineage.DMSReplicator.toString">toString</a></code> | Returns a string representation of this construct. |
+
+---
+
+##### `toString` <a name="toString" id="cdk-metaflow-openlineage.DMSReplicator.toString"></a>
+
+```typescript
+public toString(): string
+```
+
+Returns a string representation of this construct.
+
+#### Static Functions <a name="Static Functions" id="Static Functions"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#cdk-metaflow-openlineage.DMSReplicator.isConstruct">isConstruct</a></code> | Checks if `x` is a construct. |
+
+---
+
+##### ~~`isConstruct`~~ <a name="isConstruct" id="cdk-metaflow-openlineage.DMSReplicator.isConstruct"></a>
+
+```typescript
+import { DMSReplicator } from 'cdk-metaflow-openlineage'
+
+DMSReplicator.isConstruct(x: any)
+```
+
+Checks if `x` is a construct.
+
+###### `x`<sup>Required</sup> <a name="x" id="cdk-metaflow-openlineage.DMSReplicator.isConstruct.parameter.x"></a>
+
+- *Type:* any
+
+Any object.
+
+---
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#cdk-metaflow-openlineage.DMSReplicator.property.node">node</a></code> | <code>constructs.Node</code> | The tree node. |
+| <code><a href="#cdk-metaflow-openlineage.DMSReplicator.property.replicatorInstance">replicatorInstance</a></code> | <code>aws-cdk-lib.aws_dms.CfnReplicationInstance</code> | *No description.* |
+| <code><a href="#cdk-metaflow-openlineage.DMSReplicator.property.task">task</a></code> | <code>aws-cdk-lib.aws_dms.CfnReplicationTask</code> | *No description.* |
+
+---
+
+##### `node`<sup>Required</sup> <a name="node" id="cdk-metaflow-openlineage.DMSReplicator.property.node"></a>
+
+```typescript
+public readonly node: Node;
+```
+
+- *Type:* constructs.Node
+
+The tree node.
+
+---
+
+##### `replicatorInstance`<sup>Optional</sup> <a name="replicatorInstance" id="cdk-metaflow-openlineage.DMSReplicator.property.replicatorInstance"></a>
+
+```typescript
+public readonly replicatorInstance: CfnReplicationInstance;
+```
+
+- *Type:* aws-cdk-lib.aws_dms.CfnReplicationInstance
+
+---
+
+##### `task`<sup>Optional</sup> <a name="task" id="cdk-metaflow-openlineage.DMSReplicator.property.task"></a>
+
+```typescript
+public readonly task: CfnReplicationTask;
+```
+
+- *Type:* aws-cdk-lib.aws_dms.CfnReplicationTask
+
+---
+
+
 ### KinesisPipeline <a name="KinesisPipeline" id="cdk-metaflow-openlineage.KinesisPipeline"></a>
 
 #### Initializers <a name="Initializers" id="cdk-metaflow-openlineage.KinesisPipeline.Initializer"></a>
@@ -1503,6 +1624,56 @@ first call to addToResourcePolicy(s).
 
 ## Structs <a name="Structs" id="Structs"></a>
 
+### DMSReplicatorProps <a name="DMSReplicatorProps" id="cdk-metaflow-openlineage.DMSReplicatorProps"></a>
+
+#### Initializer <a name="Initializer" id="cdk-metaflow-openlineage.DMSReplicatorProps.Initializer"></a>
+
+```typescript
+import { DMSReplicatorProps } from 'cdk-metaflow-openlineage'
+
+const dMSReplicatorProps: DMSReplicatorProps = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#cdk-metaflow-openlineage.DMSReplicatorProps.property.source">source</a></code> | <code><a href="#cdk-metaflow-openlineage.SourceProps">SourceProps</a></code> | *No description.* |
+| <code><a href="#cdk-metaflow-openlineage.DMSReplicatorProps.property.target">target</a></code> | <code><a href="#cdk-metaflow-openlineage.TargetProps">TargetProps</a></code> | *No description.* |
+| <code><a href="#cdk-metaflow-openlineage.DMSReplicatorProps.property.vpc">vpc</a></code> | <code>aws-cdk-lib.aws_ec2.IVpc</code> | *No description.* |
+
+---
+
+##### `source`<sup>Required</sup> <a name="source" id="cdk-metaflow-openlineage.DMSReplicatorProps.property.source"></a>
+
+```typescript
+public readonly source: SourceProps;
+```
+
+- *Type:* <a href="#cdk-metaflow-openlineage.SourceProps">SourceProps</a>
+
+---
+
+##### `target`<sup>Required</sup> <a name="target" id="cdk-metaflow-openlineage.DMSReplicatorProps.property.target"></a>
+
+```typescript
+public readonly target: TargetProps;
+```
+
+- *Type:* <a href="#cdk-metaflow-openlineage.TargetProps">TargetProps</a>
+
+---
+
+##### `vpc`<sup>Required</sup> <a name="vpc" id="cdk-metaflow-openlineage.DMSReplicatorProps.property.vpc"></a>
+
+```typescript
+public readonly vpc: IVpc;
+```
+
+- *Type:* aws-cdk-lib.aws_ec2.IVpc
+
+---
+
 ### MetaflowOpenlineageProps <a name="MetaflowOpenlineageProps" id="cdk-metaflow-openlineage.MetaflowOpenlineageProps"></a>
 
 #### Initializer <a name="Initializer" id="cdk-metaflow-openlineage.MetaflowOpenlineageProps.Initializer"></a>
@@ -1683,6 +1854,73 @@ public readonly securityGroupIds: string[];
 ```
 
 - *Type:* string[]
+
+---
+
+### SourceProps <a name="SourceProps" id="cdk-metaflow-openlineage.SourceProps"></a>
+
+#### Initializer <a name="Initializer" id="cdk-metaflow-openlineage.SourceProps.Initializer"></a>
+
+```typescript
+import { SourceProps } from 'cdk-metaflow-openlineage'
+
+const sourceProps: SourceProps = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#cdk-metaflow-openlineage.SourceProps.property.sourceDB">sourceDB</a></code> | <code><a href="#cdk-metaflow-openlineage.RDSReadReplica">RDSReadReplica</a></code> | *No description.* |
+
+---
+
+##### `sourceDB`<sup>Required</sup> <a name="sourceDB" id="cdk-metaflow-openlineage.SourceProps.property.sourceDB"></a>
+
+```typescript
+public readonly sourceDB: RDSReadReplica;
+```
+
+- *Type:* <a href="#cdk-metaflow-openlineage.RDSReadReplica">RDSReadReplica</a>
+
+---
+
+### TargetProps <a name="TargetProps" id="cdk-metaflow-openlineage.TargetProps"></a>
+
+#### Initializer <a name="Initializer" id="cdk-metaflow-openlineage.TargetProps.Initializer"></a>
+
+```typescript
+import { TargetProps } from 'cdk-metaflow-openlineage'
+
+const targetProps: TargetProps = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#cdk-metaflow-openlineage.TargetProps.property.bucket">bucket</a></code> | <code>aws-cdk-lib.aws_s3.IBucket</code> | *No description.* |
+| <code><a href="#cdk-metaflow-openlineage.TargetProps.property.stream">stream</a></code> | <code>aws-cdk-lib.aws_kinesis.IStream</code> | *No description.* |
+
+---
+
+##### `bucket`<sup>Required</sup> <a name="bucket" id="cdk-metaflow-openlineage.TargetProps.property.bucket"></a>
+
+```typescript
+public readonly bucket: IBucket;
+```
+
+- *Type:* aws-cdk-lib.aws_s3.IBucket
+
+---
+
+##### `stream`<sup>Required</sup> <a name="stream" id="cdk-metaflow-openlineage.TargetProps.property.stream"></a>
+
+```typescript
+public readonly stream: IStream;
+```
+
+- *Type:* aws-cdk-lib.aws_kinesis.IStream
 
 ---
 
