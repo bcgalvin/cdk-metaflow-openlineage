@@ -1,12 +1,12 @@
 {
   "name": "cdk-metaflow-openlineage",
+  "description": "AWS CDK construct library to forward metadata database cdc events to dynamodb",
   "repository": {
     "type": "git",
     "url": "https://github.com/bcgalvin/cdk-metaflow-openlineage.git"
   },
   "scripts": {
     "build": "npx projen build",
-    "bump": "npx projen bump",
     "clobber": "npx projen clobber",
     "compat": "npx projen compat",
     "compile": "npx projen compile",
@@ -14,16 +14,24 @@
     "docgen": "npx projen docgen",
     "eject": "npx projen eject",
     "eslint": "npx projen eslint",
+    "integ": "npx projen integ",
+    "integ:default:assert": "npx projen integ:default:assert",
+    "integ:default:deploy": "npx projen integ:default:deploy",
+    "integ:default:destroy": "npx projen integ:default:destroy",
+    "integ:default:snapshot": "npx projen integ:default:snapshot",
+    "integ:default:watch": "npx projen integ:default:watch",
+    "integ:snapshot-all": "npx projen integ:snapshot-all",
+    "integ:update": "npx projen integ:update",
     "package": "npx projen package",
     "package-all": "npx projen package-all",
     "package:js": "npx projen package:js",
+    "package:python": "npx projen package:python",
     "post-compile": "npx projen post-compile",
     "post-upgrade": "npx projen post-upgrade",
     "pre-compile": "npx projen pre-compile",
-    "release": "npx projen release",
+    "rosetta:extract": "npx projen rosetta:extract",
     "test": "npx projen test",
     "test:watch": "npx projen test:watch",
-    "unbump": "npx projen unbump",
     "upgrade": "npx projen upgrade",
     "watch": "npx projen watch",
     "projen": "npx projen"
@@ -34,16 +42,22 @@
     "organization": false
   },
   "devDependencies": {
+    "@aws-cdk/integ-runner": "latest",
+    "@aws-cdk/integ-tests-alpha": "latest",
+    "@types/aws-lambda": "^8.10.125",
     "@types/jest": "^29.5.7",
     "@types/node": "^16",
     "@typescript-eslint/eslint-plugin": "^6",
     "@typescript-eslint/parser": "^6",
-    "aws-cdk-lib": "2.1.0",
+    "aws-cdk": "^2",
+    "aws-cdk-lib": "2.104.0",
     "constructs": "10.0.5",
     "eslint": "^8",
+    "eslint-config-prettier": "^9.0.0",
     "eslint-import-resolver-node": "^0.3.9",
     "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-prettier": "^5.0.1",
     "jest": "^29.7.0",
     "jest-junit": "^15",
     "jsii": "~5.0.0",
@@ -52,23 +66,32 @@
     "jsii-pacmak": "^1.91.0",
     "jsii-rosetta": "~5.0.0",
     "npm-check-updates": "^16",
+    "prettier": "^3.0.3",
     "projen": "^0.76.18",
-    "standard-version": "^9",
     "ts-jest": "^29.1.1",
     "ts-node": "^10.9.1",
     "typescript": "^5.2.2"
   },
   "peerDependencies": {
-    "aws-cdk-lib": "^2.1.0",
+    "aws-cdk-lib": "^2.104.0",
     "constructs": "^10.0.5"
+  },
+  "dependencies": {
+    "cdk-nag": "^2.27.183"
   },
   "keywords": [
     "cdk"
   ],
   "main": "lib/index.js",
-  "license": "Apache-2.0",
+  "license": "MIT",
   "version": "0.0.0",
   "jest": {
+    "globals": {
+      "ts-jest": {
+        "tsconfig": "tsconfig.dev.json",
+        "isolatedModules": true
+      }
+    },
     "testMatch": [
       "<rootDir>/src/**/__tests__/**/*.ts?(x)",
       "<rootDir>/(test|src)/**/*(*.)@(spec|test).ts?(x)"
@@ -101,18 +124,18 @@
         }
       ]
     ],
-    "preset": "ts-jest",
-    "globals": {
-      "ts-jest": {
-        "tsconfig": "tsconfig.dev.json"
-      }
-    }
+    "preset": "ts-jest"
   },
   "types": "lib/index.d.ts",
   "stability": "stable",
   "jsii": {
     "outdir": "dist",
-    "targets": {},
+    "targets": {
+      "python": {
+        "distName": "cdk-metaflow-openlineage",
+        "module": "cdk_metaflow_openlineage"
+      }
+    },
     "tsc": {
       "outDir": "lib",
       "rootDir": "src"

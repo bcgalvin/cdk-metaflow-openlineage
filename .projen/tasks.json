@@ -24,23 +24,6 @@
         }
       ]
     },
-    "bump": {
-      "name": "bump",
-      "description": "Bumps version based on latest git tag and generates a changelog entry",
-      "env": {
-        "OUTFILE": "package.json",
-        "CHANGELOG": "dist/changelog.md",
-        "BUMPFILE": "dist/version.txt",
-        "RELEASETAG": "dist/releasetag.txt",
-        "RELEASE_TAG_PREFIX": ""
-      },
-      "steps": [
-        {
-          "builtin": "release/bump-version"
-        }
-      ],
-      "condition": "! git log --oneline -1 | grep -q \"chore(release):\""
-    },
     "clobber": {
       "name": "clobber",
       "description": "hard resets to HEAD of origin and cleans the local repo",
@@ -126,7 +109,7 @@
       "description": "Runs eslint against the codebase",
       "steps": [
         {
-          "exec": "eslint --ext .ts,.tsx --fix --no-error-on-unmatched-pattern src test build-tools projenrc .projenrc.ts"
+          "exec": "eslint --ext .ts,.tsx --fix --no-error-on-unmatched-pattern src test test build-tools projenrc .projenrc.ts"
         }
       ]
     },
@@ -148,6 +131,98 @@
         }
       ]
     },
+    "integ": {
+      "name": "integ",
+      "description": "Run integration snapshot tests",
+      "steps": [
+        {
+          "exec": "integ-runner $@ --language typescript",
+          "receiveArgs": true
+        }
+      ]
+    },
+    "integ:default:assert": {
+      "name": "integ:default:assert",
+      "description": "assert the snapshot of integration test 'default'",
+      "steps": [
+        {
+          "exec": "[ -d \"test/default.integ.snapshot\" ] || (echo \"No snapshot available for integration test 'default'. Run 'projen integ:default:deploy' to capture.\" && exit 1)"
+        },
+        {
+          "exec": "cdk synth --app \"ts-node -P tsconfig.dev.json test/default.integ.ts\" --no-notices --no-version-reporting --no-asset-metadata --no-path-metadata -o test/.tmp/default.integ/assert.cdk.out > /dev/null"
+        },
+        {
+          "exec": "diff -r -x asset.* -x cdk.out -x manifest.json -x tree.json test/default.integ.snapshot/ test/.tmp/default.integ/assert.cdk.out/"
+        }
+      ]
+    },
+    "integ:default:deploy": {
+      "name": "integ:default:deploy",
+      "description": "deploy integration test 'default' and capture snapshot",
+      "steps": [
+        {
+          "exec": "rm -fr test/.tmp/default.integ/deploy.cdk.out"
+        },
+        {
+          "exec": "cdk deploy --app \"ts-node -P tsconfig.dev.json test/default.integ.ts\" --no-notices --no-version-reporting --no-asset-metadata --no-path-metadata '**' --require-approval=never -o test/.tmp/default.integ/deploy.cdk.out"
+        },
+        {
+          "exec": "rm -fr test/default.integ.snapshot"
+        },
+        {
+          "exec": "mv test/.tmp/default.integ/deploy.cdk.out test/default.integ.snapshot"
+        },
+        {
+          "spawn": "integ:default:destroy"
+        }
+      ]
+    },
+    "integ:default:destroy": {
+      "name": "integ:default:destroy",
+      "description": "destroy integration test 'default'",
+      "steps": [
+        {
+          "exec": "cdk destroy --app test/default.integ.snapshot '**' --no-version-reporting"
+        }
+      ]
+    },
+    "integ:default:snapshot": {
+      "name": "integ:default:snapshot",
+      "description": "update snapshot for integration test \"default\"",
+      "steps": [
+        {
+          "exec": "cdk synth --app \"ts-node -P tsconfig.dev.json test/default.integ.ts\" --no-notices --no-version-reporting --no-asset-metadata --no-path-metadata -o test/default.integ.snapshot > /dev/null"
+        }
+      ]
+    },
+    "integ:default:watch": {
+      "name": "integ:default:watch",
+      "description": "watch integration test 'default' (without updating snapshots)",
+      "steps": [
+        {
+          "exec": "cdk watch --app \"ts-node -P tsconfig.dev.json test/default.integ.ts\" --no-notices --no-version-reporting --no-asset-metadata --no-path-metadata '**' -o test/.tmp/default.integ/deploy.cdk.out"
+        }
+      ]
+    },
+    "integ:snapshot-all": {
+      "name": "integ:snapshot-all",
+      "description": "update snapshot for all integration tests",
+      "steps": [
+        {
+          "spawn": "integ:default:snapshot"
+        }
+      ]
+    },
+    "integ:update": {
+      "name": "integ:update",
+      "description": "Run and update integration snapshot tests",
+      "steps": [
+        {
+          "exec": "integ-runner $@ --language typescript --update-on-failed",
+          "receiveArgs": true
+        }
+      ]
+    },
     "package": {
       "name": "package",
       "description": "Creates the distribution package",
@@ -163,6 +238,9 @@
       "steps": [
         {
           "spawn": "package:js"
+        },
+        {
+          "spawn": "package:python"
         }
       ]
     },
@@ -175,12 +253,24 @@
         }
       ]
     },
+    "package:python": {
+      "name": "package:python",
+      "description": "Create python language bindings",
+      "steps": [
+        {
+          "exec": "jsii-pacmak -v --target python"
+        }
+      ]
+    },
     "post-compile": {
       "name": "post-compile",
       "description": "Runs after successful compilation",
       "steps": [
         {
           "spawn": "docgen"
+        },
+        {
+          "spawn": "rosetta:extract"
         }
       ]
     },
@@ -192,27 +282,12 @@
       "name": "pre-compile",
       "description": "Prepare the project for compilation"
     },
-    "release": {
-      "name": "release",
-      "description": "Prepare a release from \"main\" branch",
-      "env": {
-        "RELEASE": "true"
-      },
+    "rosetta:extract": {
+      "name": "rosetta:extract",
+      "description": "Test rosetta extract",
       "steps": [
         {
-          "exec": "rm -fr dist"
-        },
-        {
-          "spawn": "bump"
-        },
-        {
-          "spawn": "build"
-        },
-        {
-          "spawn": "unbump"
-        },
-        {
-          "exec": "git diff --ignore-space-at-eol --exit-code"
+          "exec": "yarn --silent jsii-rosetta extract --strict"
         }
       ]
     },
@@ -226,6 +301,12 @@
         },
         {
           "spawn": "eslint"
+        },
+        {
+          "spawn": "integ:default:assert"
+        },
+        {
+          "spawn": "integ"
         }
       ]
     },
@@ -235,22 +316,6 @@
       "steps": [
         {
           "exec": "jest --watch"
-        }
-      ]
-    },
-    "unbump": {
-      "name": "unbump",
-      "description": "Restores version to 0.0.0",
-      "env": {
-        "OUTFILE": "package.json",
-        "CHANGELOG": "dist/changelog.md",
-        "BUMPFILE": "dist/version.txt",
-        "RELEASETAG": "dist/releasetag.txt",
-        "RELEASE_TAG_PREFIX": ""
-      },
-      "steps": [
-        {
-          "builtin": "release/reset-version"
         }
       ]
     },
@@ -265,13 +330,13 @@
           "exec": "yarn upgrade npm-check-updates"
         },
         {
-          "exec": "npm-check-updates --upgrade --target=minor --peer --dep=dev,peer,prod,optional --filter=@types/jest,@types/node,@typescript-eslint/eslint-plugin,@typescript-eslint/parser,eslint-import-resolver-node,eslint-import-resolver-typescript,eslint-plugin-import,eslint,jest,jest-junit,jsii-diff,jsii-docgen,jsii-pacmak,npm-check-updates,projen,standard-version,ts-jest,ts-node,typescript,aws-cdk-lib,constructs"
+          "exec": "npm-check-updates --upgrade --target=minor --peer --dep=dev,peer,prod,optional --filter=@aws-cdk/integ-runner,@aws-cdk/integ-tests-alpha,@types/aws-lambda,@types/jest,@types/node,@typescript-eslint/eslint-plugin,@typescript-eslint/parser,aws-cdk,eslint-config-prettier,eslint-import-resolver-node,eslint-import-resolver-typescript,eslint-plugin-import,eslint-plugin-prettier,eslint,jest,jest-junit,jsii-diff,jsii-docgen,jsii-pacmak,npm-check-updates,prettier,projen,ts-jest,ts-node,typescript,aws-cdk-lib,constructs,cdk-nag"
         },
         {
           "exec": "yarn install --check-files"
         },
         {
-          "exec": "yarn upgrade @types/jest @types/node @typescript-eslint/eslint-plugin @typescript-eslint/parser eslint-import-resolver-node eslint-import-resolver-typescript eslint-plugin-import eslint jest jest-junit jsii-diff jsii-docgen jsii-pacmak npm-check-updates projen standard-version ts-jest ts-node typescript aws-cdk-lib constructs"
+          "exec": "yarn upgrade @aws-cdk/integ-runner @aws-cdk/integ-tests-alpha @types/aws-lambda @types/jest @types/node @typescript-eslint/eslint-plugin @typescript-eslint/parser aws-cdk eslint-config-prettier eslint-import-resolver-node eslint-import-resolver-typescript eslint-plugin-import eslint-plugin-prettier eslint jest jest-junit jsii-diff jsii-docgen jsii-pacmak npm-check-updates prettier projen ts-jest ts-node typescript aws-cdk-lib constructs cdk-nag"
         },
         {
           "exec": "npx projen"
