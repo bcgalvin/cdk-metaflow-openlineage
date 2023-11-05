@@ -1,2 +1,2 @@
 export * from './rds-read-replica';
-export * from './s3';
+export * from './dms-replication-bucket';
