@@ -70,7 +70,12 @@ exports[`snapshot Should match snapshot 1`] = `
         },
         "StorageType": "gp2",
         "VPCSecurityGroups": [
-          "sg-0efd56e2aa8edc334",
+          {
+            "Fn::GetAtt": [
+              "metaflowopenlineagesnapshottestolreadreplicareadreplicasg261613AF",
+              "GroupId",
+            ],
+          },
         ],
       },
       "Type": "AWS::RDS::DBInstance",
@@ -85,6 +90,126 @@ exports[`snapshot Should match snapshot 1`] = `
         ],
       },
       "Type": "AWS::RDS::DBSubnetGroup",
+    },
+    "metaflowopenlineagesnapshottestolreadreplicareadreplicasg261613AF": {
+      "Properties": {
+        "GroupDescription": "Default/metaflow-openlineage-snapshot-test/SG",
+        "SecurityGroupIngress": [
+          {
+            "CidrIp": "1.2.3.4/5",
+            "Description": "Allow TCP port for PostgreSQL from private subnets",
+            "FromPort": 5432,
+            "IpProtocol": "tcp",
+            "ToPort": 5432,
+          },
+        ],
+        "VpcId": "vpc-12345",
+      },
+      "Type": "AWS::EC2::SecurityGroup",
+    },
+    "metaflowopenlineagesnapshottestolreadreplicareadreplicasgfrommetaflowopenlineagesnapshottestolreadreplicareadreplicasg8EAD0F324436B51A921": {
+      "Properties": {
+        "Description": "Traffic within this SecurityGroup",
+        "FromPort": 443,
+        "GroupId": {
+          "Fn::GetAtt": [
+            "metaflowopenlineagesnapshottestolreadreplicareadreplicasg261613AF",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": {
+          "Fn::GetAtt": [
+            "metaflowopenlineagesnapshottestolreadreplicareadreplicasg261613AF",
+            "GroupId",
+          ],
+        },
+        "ToPort": 443,
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
+    "metaflowopenlineagesnapshottestolreadreplicareadreplicasgfrommetaflowopenlineagesnapshottestolreadreplicareadreplicasg8EAD0F32IndirectPortEE83E58E": {
+      "Properties": {
+        "Description": "from metaflowopenlineagesnapshottestolreadreplicareadreplicasg8EAD0F32:{IndirectPort}",
+        "FromPort": {
+          "Fn::GetAtt": [
+            "metaflowopenlineagesnapshottestolreadreplicaolreadreplicareadreplicainstanceB62C1055",
+            "Endpoint.Port",
+          ],
+        },
+        "GroupId": {
+          "Fn::GetAtt": [
+            "metaflowopenlineagesnapshottestolreadreplicareadreplicasg261613AF",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": {
+          "Fn::GetAtt": [
+            "metaflowopenlineagesnapshottestolreadreplicareadreplicasg261613AF",
+            "GroupId",
+          ],
+        },
+        "ToPort": {
+          "Fn::GetAtt": [
+            "metaflowopenlineagesnapshottestolreadreplicaolreadreplicareadreplicainstanceB62C1055",
+            "Endpoint.Port",
+          ],
+        },
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
+    "metaflowopenlineagesnapshottestolreadreplicareadreplicasgtometaflowopenlineagesnapshottestolreadreplicareadreplicasg8EAD0F3244320938B08": {
+      "Properties": {
+        "Description": "Traffic within this SecurityGroup",
+        "DestinationSecurityGroupId": {
+          "Fn::GetAtt": [
+            "metaflowopenlineagesnapshottestolreadreplicareadreplicasg261613AF",
+            "GroupId",
+          ],
+        },
+        "FromPort": 443,
+        "GroupId": {
+          "Fn::GetAtt": [
+            "metaflowopenlineagesnapshottestolreadreplicareadreplicasg261613AF",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
+        "ToPort": 443,
+      },
+      "Type": "AWS::EC2::SecurityGroupEgress",
+    },
+    "metaflowopenlineagesnapshottestolreadreplicareadreplicasgtometaflowopenlineagesnapshottestolreadreplicareadreplicasg8EAD0F32IndirectPort25479D30": {
+      "Properties": {
+        "Description": "to metaflowopenlineagesnapshottestolreadreplicareadreplicasg8EAD0F32:{IndirectPort}",
+        "DestinationSecurityGroupId": {
+          "Fn::GetAtt": [
+            "metaflowopenlineagesnapshottestolreadreplicareadreplicasg261613AF",
+            "GroupId",
+          ],
+        },
+        "FromPort": {
+          "Fn::GetAtt": [
+            "metaflowopenlineagesnapshottestolreadreplicaolreadreplicareadreplicainstanceB62C1055",
+            "Endpoint.Port",
+          ],
+        },
+        "GroupId": {
+          "Fn::GetAtt": [
+            "metaflowopenlineagesnapshottestolreadreplicareadreplicasg261613AF",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
+        "ToPort": {
+          "Fn::GetAtt": [
+            "metaflowopenlineagesnapshottestolreadreplicaolreadreplicareadreplicainstanceB62C1055",
+            "Endpoint.Port",
+          ],
+        },
+      },
+      "Type": "AWS::EC2::SecurityGroupEgress",
     },
   },
   "Rules": {

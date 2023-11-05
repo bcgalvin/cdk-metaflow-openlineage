@@ -43,12 +43,9 @@ new MetaflowOpenlineage(stack, 'metaflow-openlineage-snapshot-test', {
         securityGroupIds: ['sg-0efd56e2aa8edc334'],
         postgresVersion: PostgresEngineVersion.VER_14_7,
         instanceType: InstanceType.of(InstanceClass.BURSTABLE3, InstanceSize.SMALL),
-        subnetSelection: {
-            onePerAz: false,
-            subnetType: SubnetType.PRIVATE_ISOLATED
-        },
     },
 });
+
 
 app.synth();
 ```

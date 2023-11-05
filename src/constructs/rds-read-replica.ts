@@ -1,4 +1,13 @@
-import { InstanceType, IVpc, SecurityGroup, SubnetSelection } from 'aws-cdk-lib/aws-ec2';
+import {
+  InstanceType,
+  ISecurityGroup,
+  ISubnet,
+  IVpc,
+  Peer,
+  Port,
+  SecurityGroup,
+  SubnetSelection,
+} from 'aws-cdk-lib/aws-ec2';
 import {
   DatabaseInstance,
   DatabaseInstanceEngine,
@@ -16,16 +25,17 @@ export interface ReplicaConfig {
   readonly securityGroupIds: string[];
   readonly postgresVersion: PostgresEngineVersion;
   readonly instanceType: InstanceType;
-  readonly subnetSelection: SubnetSelection;
 }
 
 export interface RDSReadReplicaProps {
   readonly vpc: IVpc;
+  readonly vpcSubnets: SubnetSelection;
   readonly replicaConfig: ReplicaConfig;
 }
 
 export class RDSReadReplica extends Construct {
   public readonly readReplica: DatabaseInstanceReadReplica;
+  public readonly readReplicaSecurityGroups: ISecurityGroup[];
 
   constructor(scope: Construct, id: string, props: RDSReadReplicaProps) {
     super(scope, id);
@@ -33,6 +43,23 @@ export class RDSReadReplica extends Construct {
     const securityGroups = props.replicaConfig.securityGroupIds.map((secgroupId) =>
       SecurityGroup.fromSecurityGroupId(this, `${id}-${secgroupId}-sg`, secgroupId),
     );
+
+    const readReplicaSecurityGroup = new SecurityGroup(scope, `${id}-read-replica-sg`, {
+      allowAllOutbound: false,
+      description: `${scope.node.path}/SG`,
+      vpc: props.vpc,
+    });
+
+    // Allow all traffic within the security group on port 443
+    readReplicaSecurityGroup.connections.allowInternally(Port.tcp(443), 'Traffic within this SecurityGroup');
+
+    props.vpc.privateSubnets.forEach((subnet: ISubnet) => {
+      readReplicaSecurityGroup.addIngressRule(
+        Peer.ipv4(subnet.ipv4CidrBlock),
+        Port.tcp(5432),
+        'Allow TCP port for PostgreSQL from private subnets',
+      );
+    });
 
     const postgresRDSInstance = DatabaseInstance.fromDatabaseInstanceAttributes(
       this,
@@ -57,12 +84,14 @@ export class RDSReadReplica extends Construct {
       sourceDatabaseInstance: postgresRDSInstance,
       instanceType: props.replicaConfig.instanceType,
       vpc: props.vpc,
-      vpcSubnets: props.replicaConfig.subnetSelection,
-      securityGroups: securityGroups,
+      vpcSubnets: props.vpcSubnets,
+      securityGroups: [readReplicaSecurityGroup],
       parameterGroup: replicationParameterGroup,
       multiAz: false,
       publiclyAccessible: false,
     });
+    this.readReplica.connections.allowDefaultPortInternally();
+    this.readReplicaSecurityGroups = this.readReplica.connections.securityGroups;
 
     NagSuppressions.addResourceSuppressions(this.readReplica, [
       {

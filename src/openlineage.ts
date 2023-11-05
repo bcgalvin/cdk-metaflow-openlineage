@@ -1,5 +1,5 @@
 import { Stack } from 'aws-cdk-lib';
-import { Vpc } from 'aws-cdk-lib/aws-ec2';
+import { SubnetType, Vpc } from 'aws-cdk-lib/aws-ec2';
 import { Construct } from 'constructs';
 import { RDSReadReplica, ReplicaConfig } from './constructs';
 
@@ -17,8 +17,14 @@ export class MetaflowOpenlineage extends Construct {
       region: Stack.of(this).region,
     });
 
+    const vpcSubnets = vpc.selectSubnets({
+      subnetType: SubnetType.PRIVATE_WITH_EGRESS,
+      onePerAz: true,
+    });
+
     new RDSReadReplica(this, 'ol-read-replica', {
       vpc: vpc,
+      vpcSubnets: vpcSubnets,
       replicaConfig: props.replicaConfig,
     });
   }

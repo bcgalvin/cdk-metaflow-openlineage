@@ -1,6 +1,6 @@
 import { Stack } from 'aws-cdk-lib';
 import { Template } from 'aws-cdk-lib/assertions';
-import { InstanceClass, InstanceSize, InstanceType, SubnetType } from 'aws-cdk-lib/aws-ec2';
+import { InstanceClass, InstanceSize, InstanceType } from 'aws-cdk-lib/aws-ec2';
 import { PostgresEngineVersion } from 'aws-cdk-lib/aws-rds';
 import { MetaflowOpenlineage } from '../src';
 
@@ -21,13 +21,9 @@ describe('snapshot', () => {
         instanceEndpointAddress: 'test.pg.us-east-1.rds.amazonaws.com',
         port: 5432,
         instanceIdentifier: 'test-mf',
-        securityGroupIds: ['sg-0efd56e2aa8edc334'],
+        securityGroupIds: ['sg-0abc12c3de4fgh567'],
         postgresVersion: PostgresEngineVersion.VER_14_7,
         instanceType: InstanceType.of(InstanceClass.BURSTABLE3, InstanceSize.SMALL),
-        subnetSelection: {
-          onePerAz: false,
-          subnetType: SubnetType.PRIVATE_ISOLATED,
-        },
       },
     });
 

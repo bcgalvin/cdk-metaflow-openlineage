@@ -185,6 +185,7 @@ Any object.
 | --- | --- | --- |
 | <code><a href="#cdk-metaflow-openlineage.RDSReadReplica.property.node">node</a></code> | <code>constructs.Node</code> | The tree node. |
 | <code><a href="#cdk-metaflow-openlineage.RDSReadReplica.property.readReplica">readReplica</a></code> | <code>aws-cdk-lib.aws_rds.DatabaseInstanceReadReplica</code> | *No description.* |
+| <code><a href="#cdk-metaflow-openlineage.RDSReadReplica.property.readReplicaSecurityGroups">readReplicaSecurityGroups</a></code> | <code>aws-cdk-lib.aws_ec2.ISecurityGroup[]</code> | *No description.* |
 
 ---
 
@@ -207,6 +208,16 @@ public readonly readReplica: DatabaseInstanceReadReplica;
 ```
 
 - *Type:* aws-cdk-lib.aws_rds.DatabaseInstanceReadReplica
+
+---
+
+##### `readReplicaSecurityGroups`<sup>Required</sup> <a name="readReplicaSecurityGroups" id="cdk-metaflow-openlineage.RDSReadReplica.property.readReplicaSecurityGroups"></a>
+
+```typescript
+public readonly readReplicaSecurityGroups: ISecurityGroup[];
+```
+
+- *Type:* aws-cdk-lib.aws_ec2.ISecurityGroup[]
 
 ---
 
@@ -268,6 +279,7 @@ const rDSReadReplicaProps: RDSReadReplicaProps = { ... }
 | --- | --- | --- |
 | <code><a href="#cdk-metaflow-openlineage.RDSReadReplicaProps.property.replicaConfig">replicaConfig</a></code> | <code><a href="#cdk-metaflow-openlineage.ReplicaConfig">ReplicaConfig</a></code> | *No description.* |
 | <code><a href="#cdk-metaflow-openlineage.RDSReadReplicaProps.property.vpc">vpc</a></code> | <code>aws-cdk-lib.aws_ec2.IVpc</code> | *No description.* |
+| <code><a href="#cdk-metaflow-openlineage.RDSReadReplicaProps.property.vpcSubnets">vpcSubnets</a></code> | <code>aws-cdk-lib.aws_ec2.SubnetSelection</code> | *No description.* |
 
 ---
 
@@ -291,6 +303,16 @@ public readonly vpc: IVpc;
 
 ---
 
+##### `vpcSubnets`<sup>Required</sup> <a name="vpcSubnets" id="cdk-metaflow-openlineage.RDSReadReplicaProps.property.vpcSubnets"></a>
+
+```typescript
+public readonly vpcSubnets: SubnetSelection;
+```
+
+- *Type:* aws-cdk-lib.aws_ec2.SubnetSelection
+
+---
+
 ### ReplicaConfig <a name="ReplicaConfig" id="cdk-metaflow-openlineage.ReplicaConfig"></a>
 
 #### Initializer <a name="Initializer" id="cdk-metaflow-openlineage.ReplicaConfig.Initializer"></a>
@@ -311,7 +333,6 @@ const replicaConfig: ReplicaConfig = { ... }
 | <code><a href="#cdk-metaflow-openlineage.ReplicaConfig.property.port">port</a></code> | <code>number</code> | *No description.* |
 | <code><a href="#cdk-metaflow-openlineage.ReplicaConfig.property.postgresVersion">postgresVersion</a></code> | <code>aws-cdk-lib.aws_rds.PostgresEngineVersion</code> | *No description.* |
 | <code><a href="#cdk-metaflow-openlineage.ReplicaConfig.property.securityGroupIds">securityGroupIds</a></code> | <code>string[]</code> | *No description.* |
-| <code><a href="#cdk-metaflow-openlineage.ReplicaConfig.property.subnetSelection">subnetSelection</a></code> | <code>aws-cdk-lib.aws_ec2.SubnetSelection</code> | *No description.* |
 
 ---
 
@@ -372,16 +393,6 @@ public readonly securityGroupIds: string[];
 ```
 
 - *Type:* string[]
-
----
-
-##### `subnetSelection`<sup>Required</sup> <a name="subnetSelection" id="cdk-metaflow-openlineage.ReplicaConfig.property.subnetSelection"></a>
-
-```typescript
-public readonly subnetSelection: SubnetSelection;
-```
-
-- *Type:* aws-cdk-lib.aws_ec2.SubnetSelection
 
 ---
 
