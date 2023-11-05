@@ -2,6 +2,164 @@
 
 ## Constructs <a name="Constructs" id="Constructs"></a>
 
+### KinesisPipeline <a name="KinesisPipeline" id="cdk-metaflow-openlineage.KinesisPipeline"></a>
+
+#### Initializers <a name="Initializers" id="cdk-metaflow-openlineage.KinesisPipeline.Initializer"></a>
+
+```typescript
+import { KinesisPipeline } from 'cdk-metaflow-openlineage'
+
+new KinesisPipeline(scope: Construct, id: string)
+```
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#cdk-metaflow-openlineage.KinesisPipeline.Initializer.parameter.scope">scope</a></code> | <code>constructs.Construct</code> | *No description.* |
+| <code><a href="#cdk-metaflow-openlineage.KinesisPipeline.Initializer.parameter.id">id</a></code> | <code>string</code> | *No description.* |
+
+---
+
+##### `scope`<sup>Required</sup> <a name="scope" id="cdk-metaflow-openlineage.KinesisPipeline.Initializer.parameter.scope"></a>
+
+- *Type:* constructs.Construct
+
+---
+
+##### `id`<sup>Required</sup> <a name="id" id="cdk-metaflow-openlineage.KinesisPipeline.Initializer.parameter.id"></a>
+
+- *Type:* string
+
+---
+
+#### Methods <a name="Methods" id="Methods"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#cdk-metaflow-openlineage.KinesisPipeline.toString">toString</a></code> | Returns a string representation of this construct. |
+
+---
+
+##### `toString` <a name="toString" id="cdk-metaflow-openlineage.KinesisPipeline.toString"></a>
+
+```typescript
+public toString(): string
+```
+
+Returns a string representation of this construct.
+
+#### Static Functions <a name="Static Functions" id="Static Functions"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#cdk-metaflow-openlineage.KinesisPipeline.isConstruct">isConstruct</a></code> | Checks if `x` is a construct. |
+
+---
+
+##### ~~`isConstruct`~~ <a name="isConstruct" id="cdk-metaflow-openlineage.KinesisPipeline.isConstruct"></a>
+
+```typescript
+import { KinesisPipeline } from 'cdk-metaflow-openlineage'
+
+KinesisPipeline.isConstruct(x: any)
+```
+
+Checks if `x` is a construct.
+
+###### `x`<sup>Required</sup> <a name="x" id="cdk-metaflow-openlineage.KinesisPipeline.isConstruct.parameter.x"></a>
+
+- *Type:* any
+
+Any object.
+
+---
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#cdk-metaflow-openlineage.KinesisPipeline.property.node">node</a></code> | <code>constructs.Node</code> | The tree node. |
+| <code><a href="#cdk-metaflow-openlineage.KinesisPipeline.property.bucket">bucket</a></code> | <code>aws-cdk-lib.aws_s3.IBucket</code> | *No description.* |
+| <code><a href="#cdk-metaflow-openlineage.KinesisPipeline.property.deliveryStream">deliveryStream</a></code> | <code>aws-cdk-lib.aws_kinesisfirehose.CfnDeliveryStream</code> | *No description.* |
+| <code><a href="#cdk-metaflow-openlineage.KinesisPipeline.property.firehoseLogGroup">firehoseLogGroup</a></code> | <code>aws-cdk-lib.aws_logs.ILogGroup</code> | *No description.* |
+| <code><a href="#cdk-metaflow-openlineage.KinesisPipeline.property.readerRole">readerRole</a></code> | <code>aws-cdk-lib.aws_iam.IRole</code> | *No description.* |
+| <code><a href="#cdk-metaflow-openlineage.KinesisPipeline.property.stream">stream</a></code> | <code>aws-cdk-lib.aws_kinesis.IStream</code> | *No description.* |
+| <code><a href="#cdk-metaflow-openlineage.KinesisPipeline.property.writerRole">writerRole</a></code> | <code>aws-cdk-lib.aws_iam.IRole</code> | *No description.* |
+
+---
+
+##### `node`<sup>Required</sup> <a name="node" id="cdk-metaflow-openlineage.KinesisPipeline.property.node"></a>
+
+```typescript
+public readonly node: Node;
+```
+
+- *Type:* constructs.Node
+
+The tree node.
+
+---
+
+##### `bucket`<sup>Required</sup> <a name="bucket" id="cdk-metaflow-openlineage.KinesisPipeline.property.bucket"></a>
+
+```typescript
+public readonly bucket: IBucket;
+```
+
+- *Type:* aws-cdk-lib.aws_s3.IBucket
+
+---
+
+##### `deliveryStream`<sup>Required</sup> <a name="deliveryStream" id="cdk-metaflow-openlineage.KinesisPipeline.property.deliveryStream"></a>
+
+```typescript
+public readonly deliveryStream: CfnDeliveryStream;
+```
+
+- *Type:* aws-cdk-lib.aws_kinesisfirehose.CfnDeliveryStream
+
+---
+
+##### `firehoseLogGroup`<sup>Required</sup> <a name="firehoseLogGroup" id="cdk-metaflow-openlineage.KinesisPipeline.property.firehoseLogGroup"></a>
+
+```typescript
+public readonly firehoseLogGroup: ILogGroup;
+```
+
+- *Type:* aws-cdk-lib.aws_logs.ILogGroup
+
+---
+
+##### `readerRole`<sup>Required</sup> <a name="readerRole" id="cdk-metaflow-openlineage.KinesisPipeline.property.readerRole"></a>
+
+```typescript
+public readonly readerRole: IRole;
+```
+
+- *Type:* aws-cdk-lib.aws_iam.IRole
+
+---
+
+##### `stream`<sup>Required</sup> <a name="stream" id="cdk-metaflow-openlineage.KinesisPipeline.property.stream"></a>
+
+```typescript
+public readonly stream: IStream;
+```
+
+- *Type:* aws-cdk-lib.aws_kinesis.IStream
+
+---
+
+##### `writerRole`<sup>Required</sup> <a name="writerRole" id="cdk-metaflow-openlineage.KinesisPipeline.property.writerRole"></a>
+
+```typescript
+public readonly writerRole: IRole;
+```
+
+- *Type:* aws-cdk-lib.aws_iam.IRole
+
+---
+
+
 ### MetaflowOpenlineage <a name="MetaflowOpenlineage" id="cdk-metaflow-openlineage.MetaflowOpenlineage"></a>
 
 #### Initializers <a name="Initializers" id="cdk-metaflow-openlineage.MetaflowOpenlineage.Initializer"></a>
@@ -85,9 +243,6 @@ Any object.
 | **Name** | **Type** | **Description** |
 | --- | --- | --- |
 | <code><a href="#cdk-metaflow-openlineage.MetaflowOpenlineage.property.node">node</a></code> | <code>constructs.Node</code> | The tree node. |
-| <code><a href="#cdk-metaflow-openlineage.MetaflowOpenlineage.property.dmsReplicationBucket">dmsReplicationBucket</a></code> | <code>aws-cdk-lib.aws_s3.IBucket</code> | *No description.* |
-| <code><a href="#cdk-metaflow-openlineage.MetaflowOpenlineage.property.firehoseLogGroup">firehoseLogGroup</a></code> | <code>aws-cdk-lib.aws_logs.ILogGroup</code> | *No description.* |
-| <code><a href="#cdk-metaflow-openlineage.MetaflowOpenlineage.property.stream">stream</a></code> | <code>aws-cdk-lib.aws_kinesis.IStream</code> | *No description.* |
 
 ---
 
@@ -100,36 +255,6 @@ public readonly node: Node;
 - *Type:* constructs.Node
 
 The tree node.
-
----
-
-##### `dmsReplicationBucket`<sup>Required</sup> <a name="dmsReplicationBucket" id="cdk-metaflow-openlineage.MetaflowOpenlineage.property.dmsReplicationBucket"></a>
-
-```typescript
-public readonly dmsReplicationBucket: IBucket;
-```
-
-- *Type:* aws-cdk-lib.aws_s3.IBucket
-
----
-
-##### `firehoseLogGroup`<sup>Required</sup> <a name="firehoseLogGroup" id="cdk-metaflow-openlineage.MetaflowOpenlineage.property.firehoseLogGroup"></a>
-
-```typescript
-public readonly firehoseLogGroup: ILogGroup;
-```
-
-- *Type:* aws-cdk-lib.aws_logs.ILogGroup
-
----
-
-##### `stream`<sup>Required</sup> <a name="stream" id="cdk-metaflow-openlineage.MetaflowOpenlineage.property.stream"></a>
-
-```typescript
-public readonly stream: IStream;
-```
-
-- *Type:* aws-cdk-lib.aws_kinesis.IStream
 
 ---
 

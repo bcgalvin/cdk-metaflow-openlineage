@@ -44,12 +44,12 @@ export class RDSReadReplica extends Construct {
     super(scope, id);
 
     const securityGroups = props.replicaConfig.securityGroupIds.map((secgroupId) =>
-      SecurityGroup.fromSecurityGroupId(this, `${id}-${secgroupId}-sg`, secgroupId),
+      SecurityGroup.fromSecurityGroupId(this, `${secgroupId}-sg`, secgroupId),
     );
 
-    this.dbSecret = Secret.fromSecretCompleteArn(this, `${id}-database-secret`, props.replicaConfig.dbSecretArn);
+    this.dbSecret = Secret.fromSecretCompleteArn(this, `database-secret`, props.replicaConfig.dbSecretArn);
 
-    const readReplicaSecurityGroup = new SecurityGroup(this, `${id}-read-replica-sg`, {
+    const readReplicaSecurityGroup = new SecurityGroup(this, `read-replica-sg`, {
       allowAllOutbound: false,
       description: `${scope.node.path}/SG`,
       vpc: props.vpc,
@@ -68,7 +68,7 @@ export class RDSReadReplica extends Construct {
 
     const postgresRDSInstance = DatabaseInstance.fromDatabaseInstanceAttributes(
       this,
-      `${id}-${props.replicaConfig.instanceIdentifier}`,
+      `${props.replicaConfig.instanceIdentifier}`,
       {
         instanceIdentifier: props.replicaConfig.instanceIdentifier,
         instanceEndpointAddress: props.replicaConfig.instanceEndpointAddress,
@@ -77,7 +77,7 @@ export class RDSReadReplica extends Construct {
       },
     );
 
-    const replicationParameterGroup = new ParameterGroup(this, `${id}-read-replica-param-group`, {
+    const replicationParameterGroup = new ParameterGroup(this, `read-replica-param-group`, {
       engine: DatabaseInstanceEngine.postgres({ version: props.replicaConfig.postgresVersion }),
       parameters: {
         'rds.logical_replication': '1',
@@ -85,7 +85,7 @@ export class RDSReadReplica extends Construct {
       },
     });
 
-    this.readReplica = new DatabaseInstanceReadReplica(this, `${id}-read-replica-instance`, {
+    this.readReplica = new DatabaseInstanceReadReplica(this, `read-replica-instance`, {
       sourceDatabaseInstance: postgresRDSInstance,
       instanceType: props.replicaConfig.instanceType,
       vpc: props.vpc,

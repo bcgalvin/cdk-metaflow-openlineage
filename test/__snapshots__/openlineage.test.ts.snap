@@ -25,7 +25,7 @@ exports[`snapshot Should match snapshot 1`] = `
             [
               "Lambda function for auto-deleting objects in ",
               {
-                "Ref": "metaflowopenlineagesnapshottestmetaflowopenlineagesnapshottestsecurebucket1CF4F0E2",
+                "Ref": "metaflowopenlineagesnapshottestkinesispipelinesecurebucket62E3AB6B",
               },
               " S3 bucket.",
             ],
@@ -66,7 +66,67 @@ exports[`snapshot Should match snapshot 1`] = `
       },
       "Type": "AWS::IAM::Role",
     },
-    "metaflowopenlineagesnapshottestmetaflowopenlineagesnapshottestfirehoselg150E20F7": {
+    "metaflowopenlineagesnapshottestkinesispipelinedeliverystream673EDE51": {
+      "Metadata": {
+        "cdk_nag": {
+          "rules_to_suppress": [
+            {
+              "id": "AwsSolutions-KDF1",
+              "reason": "If kmsEncryptionConfig isn't specified it will use the aws managed key and not no encryption",
+            },
+          ],
+        },
+      },
+      "Properties": {
+        "DeliveryStreamType": "KinesisStreamAsSource",
+        "ExtendedS3DestinationConfiguration": {
+          "BucketARN": {
+            "Fn::GetAtt": [
+              "metaflowopenlineagesnapshottestkinesispipelinesecurebucket62E3AB6B",
+              "Arn",
+            ],
+          },
+          "BufferingHints": {
+            "IntervalInSeconds": 60,
+            "SizeInMBs": 128,
+          },
+          "CloudWatchLoggingOptions": {
+            "Enabled": true,
+            "LogGroupName": {
+              "Ref": "metaflowopenlineagesnapshottestkinesispipelinefirehoselgE0C4F371",
+            },
+            "LogStreamName": {
+              "Ref": "metaflowopenlineagesnapshottestkinesispipelinefirehosels0E07643E",
+            },
+          },
+          "CompressionFormat": "UNCOMPRESSED",
+          "ErrorOutputPrefix": "error/",
+          "Prefix": "processed/",
+          "RoleARN": {
+            "Fn::GetAtt": [
+              "metaflowopenlineagesnapshottestkinesispipelinefirehosewriter3DA679BE",
+              "Arn",
+            ],
+          },
+        },
+        "KinesisStreamSourceConfiguration": {
+          "KinesisStreamARN": {
+            "Fn::GetAtt": [
+              "metaflowopenlineagesnapshottestkinesispipelinetargetstream149689AD",
+              "Arn",
+            ],
+          },
+          "RoleARN": {
+            "Fn::GetAtt": [
+              "metaflowopenlineagesnapshottestkinesispipelinefirehosereader15CC90A5",
+              "Arn",
+            ],
+          },
+        },
+      },
+      "Type": "AWS::KinesisFirehose::DeliveryStream",
+    },
+    "metaflowopenlineagesnapshottestkinesispipelinefirehoselgE0C4F371": {
       "DeletionPolicy": "Delete",
       "Properties": {
         "RetentionInDays": 7,
@@ -74,228 +134,156 @@ exports[`snapshot Should match snapshot 1`] = `
       "Type": "AWS::Logs::LogGroup",
       "UpdateReplacePolicy": "Delete",
     },
-    "metaflowopenlineagesnapshottestmetaflowopenlineagesnapshottestfirehoselsB59B8105": {
+    "metaflowopenlineagesnapshottestkinesispipelinefirehosels0E07643E": {
       "DeletionPolicy": "Delete",
       "Properties": {
         "LogGroupName": {
-          "Ref": "metaflowopenlineagesnapshottestmetaflowopenlineagesnapshottestfirehoselg150E20F7",
+          "Ref": "metaflowopenlineagesnapshottestkinesispipelinefirehoselgE0C4F371",
         },
       },
       "Type": "AWS::Logs::LogStream",
       "UpdateReplacePolicy": "Delete",
     },
-    "metaflowopenlineagesnapshottestmetaflowopenlineagesnapshottestreadreplicametaflowopenlineagesnapshottestreadreplicadatabasesecretAttachmentC7ECDDBE": {
+    "metaflowopenlineagesnapshottestkinesispipelinefirehosereader15CC90A5": {
       "Properties": {
-        "SecretId": "arn:aws:secretsmanager:us-east-1:123456789012:secret:test-secret",
-        "TargetId": {
-          "Ref": "metaflowopenlineagesnapshottestmetaflowopenlineagesnapshottestreadreplicametaflowopenlineagesnapshottestreadreplicareadreplicainstance3A5E5698",
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "firehose.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
         },
-        "TargetType": "AWS::RDS::DBInstance",
       },
-      "Type": "AWS::SecretsManager::SecretTargetAttachment",
+      "Type": "AWS::IAM::Role",
     },
-    "metaflowopenlineagesnapshottestmetaflowopenlineagesnapshottestreadreplicametaflowopenlineagesnapshottestreadreplicareadreplicainstance3A5E5698": {
-      "DeletionPolicy": "Snapshot",
+    "metaflowopenlineagesnapshottestkinesispipelinefirehosereaderDefaultPolicy72626C76": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "kinesis:DescribeStreamSummary",
+                "kinesis:GetRecords",
+                "kinesis:GetShardIterator",
+                "kinesis:ListShards",
+                "kinesis:SubscribeToShard",
+                "kinesis:DescribeStream",
+                "kinesis:ListStreams",
+                "kinesis:DescribeStreamConsumer",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "metaflowopenlineagesnapshottestkinesispipelinetargetstream149689AD",
+                  "Arn",
+                ],
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "metaflowopenlineagesnapshottestkinesispipelinefirehosereaderDefaultPolicy72626C76",
+        "Roles": [
+          {
+            "Ref": "metaflowopenlineagesnapshottestkinesispipelinefirehosereader15CC90A5",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "metaflowopenlineagesnapshottestkinesispipelinefirehosewriter3DA679BE": {
       "Metadata": {
         "cdk_nag": {
           "rules_to_suppress": [
             {
-              "id": "AwsSolutions-RDS11",
-              "reason": "Replica uses default port",
-            },
-            {
-              "id": "AwsSolutions-RDS10",
-              "reason": "Replica doesn't have deletion protection turned on",
-            },
-            {
-              "id": "AwsSolutions-RDS3",
-              "reason": "Replica is single AZ",
-            },
-            {
-              "id": "AwsSolutions-RDS2",
-              "reason": "Replica not encrypted",
+              "id": "AwsSolutions-IAM5",
+              "reason": "This is coming from the grant() methods on the s3 bucket construct, which is least-priv enough for me",
             },
           ],
         },
       },
       "Properties": {
-        "CopyTagsToSnapshot": true,
-        "DBInstanceClass": "db.t3.small",
-        "DBParameterGroupName": {
-          "Ref": "metaflowopenlineagesnapshottestmetaflowopenlineagesnapshottestreadreplicametaflowopenlineagesnapshottestreadreplicareadreplicaparamgroupA845077E",
-        },
-        "DBSubnetGroupName": {
-          "Ref": "metaflowopenlineagesnapshottestmetaflowopenlineagesnapshottestreadreplicametaflowopenlineagesnapshottestreadreplicareadreplicainstanceSubnetGroupC5F952C5",
-        },
-        "MultiAZ": false,
-        "PubliclyAccessible": false,
-        "SourceDBInstanceIdentifier": {
-          "Fn::Join": [
-            "",
-            [
-              "arn:",
-              {
-                "Ref": "AWS::Partition",
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "firehose.amazonaws.com",
               },
-              ":rds:us-east-1:123456789012:db:test-mf",
-            ],
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "metaflowopenlineagesnapshottestkinesispipelinefirehosewriterDefaultPolicyD95643A0": {
+      "Metadata": {
+        "cdk_nag": {
+          "rules_to_suppress": [
+            {
+              "id": "AwsSolutions-IAM5",
+              "reason": "This is coming from the grant() methods on the s3 bucket construct, which is least-priv enough for me",
+            },
           ],
         },
-        "StorageType": "gp2",
-        "VPCSecurityGroups": [
+      },
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "s3:DeleteObject*",
+                "s3:PutObject",
+                "s3:PutObjectLegalHold",
+                "s3:PutObjectRetention",
+                "s3:PutObjectTagging",
+                "s3:PutObjectVersionTagging",
+                "s3:Abort*",
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "metaflowopenlineagesnapshottestkinesispipelinesecurebucket62E3AB6B",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "metaflowopenlineagesnapshottestkinesispipelinesecurebucket62E3AB6B",
+                          "Arn",
+                        ],
+                      },
+                      "/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "metaflowopenlineagesnapshottestkinesispipelinefirehosewriterDefaultPolicyD95643A0",
+        "Roles": [
           {
-            "Fn::GetAtt": [
-              "metaflowopenlineagesnapshottestmetaflowopenlineagesnapshottestreadreplicametaflowopenlineagesnapshottestreadreplicareadreplicasg7194715A",
-              "GroupId",
-            ],
+            "Ref": "metaflowopenlineagesnapshottestkinesispipelinefirehosewriter3DA679BE",
           },
         ],
       },
-      "Type": "AWS::RDS::DBInstance",
-      "UpdateReplacePolicy": "Snapshot",
+      "Type": "AWS::IAM::Policy",
     },
-    "metaflowopenlineagesnapshottestmetaflowopenlineagesnapshottestreadreplicametaflowopenlineagesnapshottestreadreplicareadreplicainstanceSubnetGroupC5F952C5": {
-      "Properties": {
-        "DBSubnetGroupDescription": "Subnet group for metaflow-openlineage-snapshot-test-read-replica-read-replica-instance database",
-        "SubnetIds": [
-          "p-12345",
-          "p-67890",
-        ],
-      },
-      "Type": "AWS::RDS::DBSubnetGroup",
-    },
-    "metaflowopenlineagesnapshottestmetaflowopenlineagesnapshottestreadreplicametaflowopenlineagesnapshottestreadreplicareadreplicaparamgroupA845077E": {
-      "Properties": {
-        "Description": "Parameter group for postgres14",
-        "Family": "postgres14",
-        "Parameters": {
-          "rds.logical_replication": "1",
-          "wal_sender_timeout": "0",
-        },
-      },
-      "Type": "AWS::RDS::DBParameterGroup",
-    },
-    "metaflowopenlineagesnapshottestmetaflowopenlineagesnapshottestreadreplicametaflowopenlineagesnapshottestreadreplicareadreplicasg7194715A": {
-      "Properties": {
-        "GroupDescription": "Default/metaflow-openlineage-snapshot-test/SG",
-        "SecurityGroupIngress": [
-          {
-            "CidrIp": "1.2.3.4/5",
-            "Description": "Traffic from private subnets",
-            "FromPort": 5432,
-            "IpProtocol": "tcp",
-            "ToPort": 5432,
-          },
-        ],
-        "VpcId": "vpc-12345",
-      },
-      "Type": "AWS::EC2::SecurityGroup",
-    },
-    "metaflowopenlineagesnapshottestmetaflowopenlineagesnapshottestreadreplicametaflowopenlineagesnapshottestreadreplicareadreplicasgfrommetaflowopenlineagesnapshottestmetaflowopenlineagesnapshottestreadreplicametaflowopenlineagesnapshottestread26881596": {
-      "Properties": {
-        "Description": "Traffic within this SecurityGroup",
-        "FromPort": 443,
-        "GroupId": {
-          "Fn::GetAtt": [
-            "metaflowopenlineagesnapshottestmetaflowopenlineagesnapshottestreadreplicametaflowopenlineagesnapshottestreadreplicareadreplicasg7194715A",
-            "GroupId",
-          ],
-        },
-        "IpProtocol": "tcp",
-        "SourceSecurityGroupId": {
-          "Fn::GetAtt": [
-            "metaflowopenlineagesnapshottestmetaflowopenlineagesnapshottestreadreplicametaflowopenlineagesnapshottestreadreplicareadreplicasg7194715A",
-            "GroupId",
-          ],
-        },
-        "ToPort": 443,
-      },
-      "Type": "AWS::EC2::SecurityGroupIngress",
-    },
-    "metaflowopenlineagesnapshottestmetaflowopenlineagesnapshottestreadreplicametaflowopenlineagesnapshottestreadreplicareadreplicasgfrommetaflowopenlineagesnapshottestmetaflowopenlineagesnapshottestreadreplicametaflowopenlineagesnapshottestread9A8853EE": {
-      "Properties": {
-        "Description": "from metaflowopenlineagesnapshottestmetaflowopenlineagesnapshottestreadreplicametaflowopenlineagesnapshottestreadreplicareadreplicasgF705EAC7:{IndirectPort}",
-        "FromPort": {
-          "Fn::GetAtt": [
-            "metaflowopenlineagesnapshottestmetaflowopenlineagesnapshottestreadreplicametaflowopenlineagesnapshottestreadreplicareadreplicainstance3A5E5698",
-            "Endpoint.Port",
-          ],
-        },
-        "GroupId": {
-          "Fn::GetAtt": [
-            "metaflowopenlineagesnapshottestmetaflowopenlineagesnapshottestreadreplicametaflowopenlineagesnapshottestreadreplicareadreplicasg7194715A",
-            "GroupId",
-          ],
-        },
-        "IpProtocol": "tcp",
-        "SourceSecurityGroupId": {
-          "Fn::GetAtt": [
-            "metaflowopenlineagesnapshottestmetaflowopenlineagesnapshottestreadreplicametaflowopenlineagesnapshottestreadreplicareadreplicasg7194715A",
-            "GroupId",
-          ],
-        },
-        "ToPort": {
-          "Fn::GetAtt": [
-            "metaflowopenlineagesnapshottestmetaflowopenlineagesnapshottestreadreplicametaflowopenlineagesnapshottestreadreplicareadreplicainstance3A5E5698",
-            "Endpoint.Port",
-          ],
-        },
-      },
-      "Type": "AWS::EC2::SecurityGroupIngress",
-    },
-    "metaflowopenlineagesnapshottestmetaflowopenlineagesnapshottestreadreplicametaflowopenlineagesnapshottestreadreplicareadreplicasgtometaflowopenlineagesnapshottestmetaflowopenlineagesnapshottestreadreplicametaflowopenlineagesnapshottestreadre5C08A971": {
-      "Properties": {
-        "Description": "to metaflowopenlineagesnapshottestmetaflowopenlineagesnapshottestreadreplicametaflowopenlineagesnapshottestreadreplicareadreplicasgF705EAC7:{IndirectPort}",
-        "DestinationSecurityGroupId": {
-          "Fn::GetAtt": [
-            "metaflowopenlineagesnapshottestmetaflowopenlineagesnapshottestreadreplicametaflowopenlineagesnapshottestreadreplicareadreplicasg7194715A",
-            "GroupId",
-          ],
-        },
-        "FromPort": {
-          "Fn::GetAtt": [
-            "metaflowopenlineagesnapshottestmetaflowopenlineagesnapshottestreadreplicametaflowopenlineagesnapshottestreadreplicareadreplicainstance3A5E5698",
-            "Endpoint.Port",
-          ],
-        },
-        "GroupId": {
-          "Fn::GetAtt": [
-            "metaflowopenlineagesnapshottestmetaflowopenlineagesnapshottestreadreplicametaflowopenlineagesnapshottestreadreplicareadreplicasg7194715A",
-            "GroupId",
-          ],
-        },
-        "IpProtocol": "tcp",
-        "ToPort": {
-          "Fn::GetAtt": [
-            "metaflowopenlineagesnapshottestmetaflowopenlineagesnapshottestreadreplicametaflowopenlineagesnapshottestreadreplicareadreplicainstance3A5E5698",
-            "Endpoint.Port",
-          ],
-        },
-      },
-      "Type": "AWS::EC2::SecurityGroupEgress",
-    },
-    "metaflowopenlineagesnapshottestmetaflowopenlineagesnapshottestreadreplicametaflowopenlineagesnapshottestreadreplicareadreplicasgtometaflowopenlineagesnapshottestmetaflowopenlineagesnapshottestreadreplicametaflowopenlineagesnapshottestreadreA4216108": {
-      "Properties": {
-        "Description": "Traffic within this SecurityGroup",
-        "DestinationSecurityGroupId": {
-          "Fn::GetAtt": [
-            "metaflowopenlineagesnapshottestmetaflowopenlineagesnapshottestreadreplicametaflowopenlineagesnapshottestreadreplicareadreplicasg7194715A",
-            "GroupId",
-          ],
-        },
-        "FromPort": 443,
-        "GroupId": {
-          "Fn::GetAtt": [
-            "metaflowopenlineagesnapshottestmetaflowopenlineagesnapshottestreadreplicametaflowopenlineagesnapshottestreadreplicareadreplicasg7194715A",
-            "GroupId",
-          ],
-        },
-        "IpProtocol": "tcp",
-        "ToPort": 443,
-      },
-      "Type": "AWS::EC2::SecurityGroupEgress",
-    },
-    "metaflowopenlineagesnapshottestmetaflowopenlineagesnapshottestsecurebucket1CF4F0E2": {
+    "metaflowopenlineagesnapshottestkinesispipelinesecurebucket62E3AB6B": {
       "DeletionPolicy": "Delete",
       "Metadata": {
         "cdk_nag": {
@@ -341,14 +329,14 @@ exports[`snapshot Should match snapshot 1`] = `
       "Type": "AWS::S3::Bucket",
       "UpdateReplacePolicy": "Delete",
     },
-    "metaflowopenlineagesnapshottestmetaflowopenlineagesnapshottestsecurebucketAutoDeleteObjectsCustomResource5D731815": {
+    "metaflowopenlineagesnapshottestkinesispipelinesecurebucketAutoDeleteObjectsCustomResource913A2C3E": {
       "DeletionPolicy": "Delete",
       "DependsOn": [
-        "metaflowopenlineagesnapshottestmetaflowopenlineagesnapshottestsecurebucketPolicy1CAEF772",
+        "metaflowopenlineagesnapshottestkinesispipelinesecurebucketPolicy10F72994",
       ],
       "Properties": {
         "BucketName": {
-          "Ref": "metaflowopenlineagesnapshottestmetaflowopenlineagesnapshottestsecurebucket1CF4F0E2",
+          "Ref": "metaflowopenlineagesnapshottestkinesispipelinesecurebucket62E3AB6B",
         },
         "ServiceToken": {
           "Fn::GetAtt": [
@@ -360,10 +348,10 @@ exports[`snapshot Should match snapshot 1`] = `
       "Type": "Custom::S3AutoDeleteObjects",
       "UpdateReplacePolicy": "Delete",
     },
-    "metaflowopenlineagesnapshottestmetaflowopenlineagesnapshottestsecurebucketPolicy1CAEF772": {
+    "metaflowopenlineagesnapshottestkinesispipelinesecurebucketPolicy10F72994": {
       "Properties": {
         "Bucket": {
-          "Ref": "metaflowopenlineagesnapshottestmetaflowopenlineagesnapshottestsecurebucket1CF4F0E2",
+          "Ref": "metaflowopenlineagesnapshottestkinesispipelinesecurebucket62E3AB6B",
         },
         "PolicyDocument": {
           "Statement": [
@@ -381,7 +369,7 @@ exports[`snapshot Should match snapshot 1`] = `
               "Resource": [
                 {
                   "Fn::GetAtt": [
-                    "metaflowopenlineagesnapshottestmetaflowopenlineagesnapshottestsecurebucket1CF4F0E2",
+                    "metaflowopenlineagesnapshottestkinesispipelinesecurebucket62E3AB6B",
                     "Arn",
                   ],
                 },
@@ -391,7 +379,7 @@ exports[`snapshot Should match snapshot 1`] = `
                     [
                       {
                         "Fn::GetAtt": [
-                          "metaflowopenlineagesnapshottestmetaflowopenlineagesnapshottestsecurebucket1CF4F0E2",
+                          "metaflowopenlineagesnapshottestkinesispipelinesecurebucket62E3AB6B",
                           "Arn",
                         ],
                       },
@@ -420,7 +408,7 @@ exports[`snapshot Should match snapshot 1`] = `
               "Resource": [
                 {
                   "Fn::GetAtt": [
-                    "metaflowopenlineagesnapshottestmetaflowopenlineagesnapshottestsecurebucket1CF4F0E2",
+                    "metaflowopenlineagesnapshottestkinesispipelinesecurebucket62E3AB6B",
                     "Arn",
                   ],
                 },
@@ -430,7 +418,7 @@ exports[`snapshot Should match snapshot 1`] = `
                     [
                       {
                         "Fn::GetAtt": [
-                          "metaflowopenlineagesnapshottestmetaflowopenlineagesnapshottestsecurebucket1CF4F0E2",
+                          "metaflowopenlineagesnapshottestkinesispipelinesecurebucket62E3AB6B",
                           "Arn",
                         ],
                       },
@@ -454,7 +442,7 @@ exports[`snapshot Should match snapshot 1`] = `
               "Resource": [
                 {
                   "Fn::GetAtt": [
-                    "metaflowopenlineagesnapshottestmetaflowopenlineagesnapshottestsecurebucket1CF4F0E2",
+                    "metaflowopenlineagesnapshottestkinesispipelinesecurebucket62E3AB6B",
                     "Arn",
                   ],
                 },
@@ -464,7 +452,7 @@ exports[`snapshot Should match snapshot 1`] = `
                     [
                       {
                         "Fn::GetAtt": [
-                          "metaflowopenlineagesnapshottestmetaflowopenlineagesnapshottestsecurebucket1CF4F0E2",
+                          "metaflowopenlineagesnapshottestkinesispipelinesecurebucket62E3AB6B",
                           "Arn",
                         ],
                       },
@@ -480,7 +468,7 @@ exports[`snapshot Should match snapshot 1`] = `
       },
       "Type": "AWS::S3::BucketPolicy",
     },
-    "metaflowopenlineagesnapshottestmetaflowopenlineagesnapshottesttargetstreamD939BBE3": {
+    "metaflowopenlineagesnapshottestkinesispipelinetargetstream149689AD": {
       "Properties": {
         "RetentionPeriodHours": 720,
         "StreamEncryption": {
@@ -492,6 +480,217 @@ exports[`snapshot Should match snapshot 1`] = `
         },
       },
       "Type": "AWS::Kinesis::Stream",
+    },
+    "metaflowopenlineagesnapshottestreadreplicadatabasesecretAttachment434D0A48": {
+      "Properties": {
+        "SecretId": "arn:aws:secretsmanager:us-east-1:123456789012:secret:test-secret",
+        "TargetId": {
+          "Ref": "metaflowopenlineagesnapshottestreadreplicareadreplicainstance721D98EE",
+        },
+        "TargetType": "AWS::RDS::DBInstance",
+      },
+      "Type": "AWS::SecretsManager::SecretTargetAttachment",
+    },
+    "metaflowopenlineagesnapshottestreadreplicareadreplicainstance721D98EE": {
+      "DeletionPolicy": "Snapshot",
+      "Metadata": {
+        "cdk_nag": {
+          "rules_to_suppress": [
+            {
+              "id": "AwsSolutions-RDS11",
+              "reason": "Replica uses default port",
+            },
+            {
+              "id": "AwsSolutions-RDS10",
+              "reason": "Replica doesn't have deletion protection turned on",
+            },
+            {
+              "id": "AwsSolutions-RDS3",
+              "reason": "Replica is single AZ",
+            },
+            {
+              "id": "AwsSolutions-RDS2",
+              "reason": "Replica not encrypted",
+            },
+          ],
+        },
+      },
+      "Properties": {
+        "CopyTagsToSnapshot": true,
+        "DBInstanceClass": "db.t3.small",
+        "DBParameterGroupName": {
+          "Ref": "metaflowopenlineagesnapshottestreadreplicareadreplicaparamgroup9ADB4391",
+        },
+        "DBSubnetGroupName": {
+          "Ref": "metaflowopenlineagesnapshottestreadreplicareadreplicainstanceSubnetGroup13A7E673",
+        },
+        "MultiAZ": false,
+        "PubliclyAccessible": false,
+        "SourceDBInstanceIdentifier": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition",
+              },
+              ":rds:us-east-1:123456789012:db:test-mf",
+            ],
+          ],
+        },
+        "StorageType": "gp2",
+        "VPCSecurityGroups": [
+          {
+            "Fn::GetAtt": [
+              "metaflowopenlineagesnapshottestreadreplicareadreplicasgD54235CF",
+              "GroupId",
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::RDS::DBInstance",
+      "UpdateReplacePolicy": "Snapshot",
+    },
+    "metaflowopenlineagesnapshottestreadreplicareadreplicainstanceSubnetGroup13A7E673": {
+      "Properties": {
+        "DBSubnetGroupDescription": "Subnet group for read-replica-instance database",
+        "SubnetIds": [
+          "p-12345",
+          "p-67890",
+        ],
+      },
+      "Type": "AWS::RDS::DBSubnetGroup",
+    },
+    "metaflowopenlineagesnapshottestreadreplicareadreplicaparamgroup9ADB4391": {
+      "Properties": {
+        "Description": "Parameter group for postgres14",
+        "Family": "postgres14",
+        "Parameters": {
+          "rds.logical_replication": "1",
+          "wal_sender_timeout": "0",
+        },
+      },
+      "Type": "AWS::RDS::DBParameterGroup",
+    },
+    "metaflowopenlineagesnapshottestreadreplicareadreplicasgD54235CF": {
+      "Properties": {
+        "GroupDescription": "Default/metaflow-openlineage-snapshot-test/SG",
+        "SecurityGroupIngress": [
+          {
+            "CidrIp": "1.2.3.4/5",
+            "Description": "Traffic from private subnets",
+            "FromPort": 5432,
+            "IpProtocol": "tcp",
+            "ToPort": 5432,
+          },
+        ],
+        "VpcId": "vpc-12345",
+      },
+      "Type": "AWS::EC2::SecurityGroup",
+    },
+    "metaflowopenlineagesnapshottestreadreplicareadreplicasgfrommetaflowopenlineagesnapshottestreadreplicareadreplicasg5DB8AB6A443406DEFB7": {
+      "Properties": {
+        "Description": "Traffic within this SecurityGroup",
+        "FromPort": 443,
+        "GroupId": {
+          "Fn::GetAtt": [
+            "metaflowopenlineagesnapshottestreadreplicareadreplicasgD54235CF",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": {
+          "Fn::GetAtt": [
+            "metaflowopenlineagesnapshottestreadreplicareadreplicasgD54235CF",
+            "GroupId",
+          ],
+        },
+        "ToPort": 443,
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
+    "metaflowopenlineagesnapshottestreadreplicareadreplicasgfrommetaflowopenlineagesnapshottestreadreplicareadreplicasg5DB8AB6AIndirectPort38FFA831": {
+      "Properties": {
+        "Description": "from metaflowopenlineagesnapshottestreadreplicareadreplicasg5DB8AB6A:{IndirectPort}",
+        "FromPort": {
+          "Fn::GetAtt": [
+            "metaflowopenlineagesnapshottestreadreplicareadreplicainstance721D98EE",
+            "Endpoint.Port",
+          ],
+        },
+        "GroupId": {
+          "Fn::GetAtt": [
+            "metaflowopenlineagesnapshottestreadreplicareadreplicasgD54235CF",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": {
+          "Fn::GetAtt": [
+            "metaflowopenlineagesnapshottestreadreplicareadreplicasgD54235CF",
+            "GroupId",
+          ],
+        },
+        "ToPort": {
+          "Fn::GetAtt": [
+            "metaflowopenlineagesnapshottestreadreplicareadreplicainstance721D98EE",
+            "Endpoint.Port",
+          ],
+        },
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
+    "metaflowopenlineagesnapshottestreadreplicareadreplicasgtometaflowopenlineagesnapshottestreadreplicareadreplicasg5DB8AB6A443729FEF97": {
+      "Properties": {
+        "Description": "Traffic within this SecurityGroup",
+        "DestinationSecurityGroupId": {
+          "Fn::GetAtt": [
+            "metaflowopenlineagesnapshottestreadreplicareadreplicasgD54235CF",
+            "GroupId",
+          ],
+        },
+        "FromPort": 443,
+        "GroupId": {
+          "Fn::GetAtt": [
+            "metaflowopenlineagesnapshottestreadreplicareadreplicasgD54235CF",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
+        "ToPort": 443,
+      },
+      "Type": "AWS::EC2::SecurityGroupEgress",
+    },
+    "metaflowopenlineagesnapshottestreadreplicareadreplicasgtometaflowopenlineagesnapshottestreadreplicareadreplicasg5DB8AB6AIndirectPort80790687": {
+      "Properties": {
+        "Description": "to metaflowopenlineagesnapshottestreadreplicareadreplicasg5DB8AB6A:{IndirectPort}",
+        "DestinationSecurityGroupId": {
+          "Fn::GetAtt": [
+            "metaflowopenlineagesnapshottestreadreplicareadreplicasgD54235CF",
+            "GroupId",
+          ],
+        },
+        "FromPort": {
+          "Fn::GetAtt": [
+            "metaflowopenlineagesnapshottestreadreplicareadreplicainstance721D98EE",
+            "Endpoint.Port",
+          ],
+        },
+        "GroupId": {
+          "Fn::GetAtt": [
+            "metaflowopenlineagesnapshottestreadreplicareadreplicasgD54235CF",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
+        "ToPort": {
+          "Fn::GetAtt": [
+            "metaflowopenlineagesnapshottestreadreplicareadreplicainstance721D98EE",
+            "Endpoint.Port",
+          ],
+        },
+      },
+      "Type": "AWS::EC2::SecurityGroupEgress",
     },
   },
   "Rules": {
